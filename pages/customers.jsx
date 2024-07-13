@@ -1,26 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { BsPersonFill, BsThreeDotsVertical } from "react-icons/bs";
-import { data } from "../data/data.js";
+import mongoose from "mongoose";
+import users from '@/model/usersModel';
 
-const customers = () => {
+const CustomersPage = ({ initialCustomers }) => {
+  const [customers, setCustomers] = useState(initialCustomers || []);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const router = useRouter();
+
+  const navigateToAddCustomer = () => {
+    router.push("/Check-Enquiry");
+  };
+
+  const toggleOrders = (customerId) => {
+    if (selectedCustomer === customerId) {
+      setSelectedCustomer(null);
+    } else {
+      setSelectedCustomer(customerId);
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-between p-4">
         <h2>Customers</h2>
-        <h2>Welcome Back, Yash</h2>
+        <button
+          onClick={navigateToAddCustomer}
+          className="bg-purple-500 p-2 rounded text-white"
+        >
+          Check Enquiry
+        </button>
       </div>
       <div className="p-4">
         <div className="w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto">
           <div className="my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer">
             <span>Name</span>
             <span className="sm:text-left text-right">Email</span>
-            <span className="hidden md:grid">Last Order</span>
-            <span className="hidden sm:grid">Method</span>
+            <span className="hidden sm:grid">Phone</span>
           </div>
           <ul>
-            {data.map((order, id) => (
+            {customers.map((customer) => (
               <li
-                key={id}
+                key={customer._id}
                 className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-2 grid 
                             md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer"
               >
@@ -28,18 +50,34 @@ const customers = () => {
                   <div className="bg-purple-100 p-3 rounded-lg">
                     <BsPersonFill className="text-purple-800" />
                   </div>
-                  <p className="pl-4">
-                    {order.name.first + " " + order.name.last}
-                  </p>
+                  <p className="pl-4">{customer.name}</p>
                 </div>
-                <p className="text-gray-600 sm:text-left text-right">
-                  {order.name.first}@gmail.com
-                </p>
-                <p className="hidden md:flex">{order.date}</p>
-                <div className="sm:flex hidden justify-between items-center">
-                  <p>{order.method}</p>
-                  <BsThreeDotsVertical />
+                <p className="text-gray-600 sm:text-left text-right">{customer.email}</p>
+                <p className="hidden sm:flex">{customer.phone}</p>
+                <div className="sm:flex hidden justify-end items-center">
+                  <button onClick={() => toggleOrders(customer._id)}>
+                    <BsThreeDotsVertical />
+                  </button>
                 </div>
+                {selectedCustomer === customer._id && (
+                  <div className="col-span-4 bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold mb-2">Orders</h3>
+                    {customer.orders.length > 0 ? (
+                      <ul>
+                        {customer.orders.map((order, index) => (
+                          <li key={index} className="mb-2">
+                            <p><strong>Order Id:</strong> {order._id}</p>
+                            <p><strong>Customer Id:</strong> {order.customer}</p>
+                            <p><strong>Price:</strong> {order.totalPrice}</p>
+                            <p><strong>Status:</strong> {order.status}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No orders found for this customer.</p>
+                    )}
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -49,4 +87,20 @@ const customers = () => {
   );
 };
 
-export default customers;
+// Server-side rendering or static generation to provide initial data
+export async function getServerSideProps() {
+  await mongoose.connect(process.env.MONGODB_URL_USER, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  const customers = await users.find({}).lean();
+  
+  return {
+    props: {
+      initialCustomers: JSON.parse(JSON.stringify(customers)),
+    },
+  };
+}
+
+export default CustomersPage;

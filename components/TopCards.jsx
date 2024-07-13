@@ -1,37 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
 
 const TopCards = () => {
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const ordersRes = await fetch('/api/orders/total');
+        const ordersData = await ordersRes.json();
+        setTotalOrders(ordersData.totalOrders);
+
+        const revenueRes = await fetch('/api/revenue/total');
+        const revenueData = await revenueRes.json();
+        setTotalRevenue(revenueData.totalRevenue);
+
+        const customersRes = await fetch('/api/total');
+        const customersData = await customersRes.json();
+        setTotalCustomers(customersData.totalCustomers);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  
   return (
-    <div className="grid lg:grid-cols-5 gap-4 p-4">
-      <div className="lg:col-span-2 col-span-1 bg-white flex justify-between w-full border p-4 rounded-lg">
-        <div className="flex flex-col w-full pb-4">
-          <p className="text-2xl font-bold">$7,482</p>
-          <p className="text-gray-600">Daily Revenue</p>
+    <div className="grid lg:grid-cols-3 gap-6 p-6">
+      <div className="bg-white shadow-lg rounded-lg p-6 flex justify-between items-center">
+        <div className="flex flex-col">
+          <p className="text-3xl font-bold text-gray-900">{totalOrders ? totalOrders.toLocaleString() : 0}</p>
+          <p className="text-gray-600">Total No of Orders</p>
         </div>
-        <p className="bg-green-100 flex justify-center items-center p-2 rounded-lg">
-          <span className="text-green-700 text-lg">+18%</span>
-        </p>
+        <div className="bg-green-100 text-green-700 p-3 rounded-full">
+          <span className="text-lg">+18%</span>
+        </div>
       </div>
-      <div className="lg:col-span-2 col-span-1 bg-white flex justify-between w-full border p-4 rounded-lg">
-        <div className="flex flex-col w-full pb-4">
-          <p className="text-2xl font-bold">$1,463,915</p>
+      <div className="bg-white shadow-lg rounded-lg p-6 flex justify-between items-center">
+        <div className="flex flex-col">
+          <p className="text-3xl font-bold text-gray-900">${totalRevenue ? totalRevenue.toLocaleString() : 0}</p>
           <p className="text-gray-600">Total Revenue</p>
         </div>
-        <p className="bg-green-100 flex justify-center items-center p-2 rounded-lg">
-          <span className="text-green-700 text-lg">+12%</span>
-        </p>
+        <div className="bg-green-100 text-green-700 p-3 rounded-full">
+          <span className="text-lg">+12%</span>
+        </div>
       </div>
-      <div className="bg-white flex justify-between w-full border p-4 rounded-lg">
-        <div className="flex flex-col w-full pb-4">
-          <p className="text-2xl font-bold">19,625</p>
+      <div className="bg-white shadow-lg rounded-lg p-6 flex justify-between items-center">
+        <div className="flex flex-col">
+          <p className="text-3xl font-bold text-gray-900">{totalCustomers.toLocaleString()}</p>
           <p className="text-gray-600">Customers</p>
         </div>
-        <p className="bg-green-100 flex justify-center items-center p-2 rounded-lg">
-          <span className="text-green-700 text-lg">+26%</span>
-        </p>
+        <div className="bg-green-100 text-green-700 p-3 rounded-full">
+          <span className="text-lg">+26%</span>
+        </div>
       </div>
     </div>
   );
 };
 
 export default TopCards;
+
