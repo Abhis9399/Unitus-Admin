@@ -62,7 +62,7 @@ const Login = () => {
         });
 
         setTimeout(() => {
-          router.push(process.env.NEXT_PUBLIC_HOST);
+          router.push('/');
         }, 1000);
 
         setEmail('');
