@@ -1,7 +1,10 @@
 import dbConnect from '@/mongoose/mongodbUser';
 import Order from '@/model/order';
 import Customer from '@/model/customer';
-export default async function handler(req,res){
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   await dbConnect();
   if (req.method === 'POST') {
     try {
@@ -28,5 +31,6 @@ export default async function handler(req,res){
   } else {
     res.status(405).json({ error: 'Method not allowed' });
   }
+})
 }
 

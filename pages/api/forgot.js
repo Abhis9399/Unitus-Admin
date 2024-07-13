@@ -4,9 +4,10 @@ import User from '@/model/Admin';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
 
-
-export default async function handler(req,res){
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
     await dbConnect();
     console.log('Received request to /api/forgot:', req.body);
 
@@ -110,5 +111,6 @@ export default async function handler(req,res){
         console.error('Error querying user:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
 };
 

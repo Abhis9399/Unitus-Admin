@@ -1,7 +1,10 @@
 import connectToDatabase from '@/mongoose/mongodbUser';
 import users from '@/model/usersModel';
 
-export default async function handler(req,res){
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   await connectToDatabase();
 
   const { customerId } = req.query;
@@ -16,4 +19,5 @@ export default async function handler(req,res){
     console.error('Error fetching enquiries:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
+})
 }

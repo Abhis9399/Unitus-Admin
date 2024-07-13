@@ -1,8 +1,10 @@
 // pages/api/customers.js
 import connectMongo from '@/mongoose/mongodbUser';
 import customers from '@/model/usersModel';
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
 
-export default async function handler(req,res){
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   await connectMongo();
     try {
       const Customers = await customers.find({});
@@ -12,4 +14,5 @@ export default async function handler(req,res){
       console.error('Error fetching customers:', error); // Add this line
       res.status(500).json({ error: 'Error fetching customers' });
     }
+  })
   }

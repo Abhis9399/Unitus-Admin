@@ -1,7 +1,9 @@
 import dbConnect from '@/mongoose/mongodbUser';
 import Customer from '@/model/customer';
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
 
-export default async function handler(req,res){
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   await dbConnect();
   try {
     const totalCustomers = await Customer.countDocuments();
@@ -9,5 +11,6 @@ export default async function handler(req,res){
   } catch (error) {
     res.status(500).json({ error: 'Error fetching total customers' });
   }
+});
 }
 

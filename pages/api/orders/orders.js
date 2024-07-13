@@ -1,7 +1,10 @@
 import connectToDatabase from '@/mongoose/mongodbUser';
 import User from '@/model/usersModel';
 import Order from '@/model/order';
-export default async function handler(req,res){
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   await connectToDatabase();
   const { enquiryId, price, customerId } = req.body;
 
@@ -27,4 +30,5 @@ export default async function handler(req,res){
     console.error('Error generating order:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
+})
 };

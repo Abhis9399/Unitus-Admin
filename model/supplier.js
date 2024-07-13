@@ -2,30 +2,30 @@
 const mongoose = require('mongoose');
 
 const supplierSchema = new mongoose.Schema({
-  representativeName: String,
-  contact: String,
-  companyName: String,
-  location: String,
-  address: String,
-  mapLink: String,
-  materialType: String,
-  annualTurnover: String,
-  numberOfEmployees: Number,
-  relationshipLevel: { type: Number, min: 1, max: 10 },
-  relationshipYears: Number,
-  inHouseLogistics: { type: String, enum: ['yes', 'no', 'don\'t know'] },
-  profilePicture: String,
+  representativeName: { type: String, required: true },
+  contact: { type: String, required: true },
+  companyName: { type: String, required: true },
+  location: { type: String, required: true },
+  address: { type: String, required: true },
+  mapLink: { type: String, required: true },
+  materialType: { type: String, required: true },
+  annualTurnover: { type: String, required: true },
+  numberOfEmployees: { type: Number, required: true },
+  relationshipLevel: { type: Number, min: 1, max: 10, required: true },
+  relationshipYears: { type: Number, required: true },
+  inHouseLogistics: { type: String, enum: ['yes', 'no', 'don\'t know'], required: true },
+  profilePicture: { type: String, required: true },
   documents: {
-    panCard: String,
-    aadhar: String,
-    gst: String,
-    cancelledCheck: String,
-    registrationCertificate: String,
-    productCertificate: String,
+    panCard: { type: String, required: true },
+    aadhar: { type: String, required: true },
+    gst: { type: String, required: true },
+    cancelledCheck: { type: String, required: true },
+    registrationCertificate: { type: String, required: true },
+    productCertificate: { type: String, required: true },
     bankDetails: {
-      accountNumber: String,
-      ifsc: String,
-      bankName: String
+      accountNumber: { type: String, required: true },
+      ifsc: { type: String, required: true },
+      bankName: { type: String, required: true }
     }
   }
 });

@@ -1,42 +1,45 @@
 import User from "@/model/Admin";
 import connectDb from "@/mongoose/mongodbUser";
-var jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import CryptoJS from "crypto-js";
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
 
-var CryptoJS = require("crypto-js")
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
+        if (req.method === 'POST') {
+            await connectDb();
 
+            try {
+                const { email, password } = req.body;
 
-export default async function handler(req,res){
-    await connectDb();
+                if (!email || !password) {
+                    return res.status(400).json({ success: false, error: "Email and password are required" });
+                }
 
-    if (req.method === 'POST') {
-        try {
-            const { email, password } = req.body;
+                const existingUser = await User.findOne({ email });
+                if (!existingUser) {
+                    return res.status(401).json({ success: false, error: "Invalid credentials" });
+                }
 
-            if (!email || !password) {
-                return res.status(400).json({ success: false, error: "Email and password are required" });
+                // Decrypt
+                const bytes = CryptoJS.AES.decrypt(existingUser.password, process.env.AES_SECRET);
+                const originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (originalText !== password) {
+                    return res.status(401).json({ success: false, error: "Invalid credentials" });
+                }
+
+                // If user exists and passwords match, return user data
+                const token = jwt.sign({ email: existingUser.email, name: existingUser.name }, process.env.JWT_SECRET, {
+                    expiresIn: '2d'
+                });
+                res.status(200).json({ success: true, token });
+            } catch (error) {
+                console.error("Error in login:", error);
+                res.status(500).json({ success: false, error: "Internal Server Error" });
             }
-
-            const existingUser = await User.findOne({ email });
-            // Decrypt
-            var bytes = CryptoJS.AES.decrypt(existingUser.password, process.env.AES_SECRET);
-            var originalText = bytes.toString(CryptoJS.enc.Utf8);
-
-            if (!existingUser || originalText !== password) {
-                return res.status(401).json({ success: false, error: "Invalid credentials" });
-            }
-
-            // If user exists and passwords match, return user data
-            // res.status(200).json({ success: true, email: existingUser.email, name: existingUser.name });
-            var token = jwt.sign({ email: existingUser.email, name: existingUser.name }, process.env.JWT_SECRET,{
-                expiresIn:'2d'
-            });
-            res.status(200).json({ success: true, token })
-        } catch (error) {
-            console.error("Error in login:", error);
-            res.status(500).json({ success: false, error: "Internal Server Error" });
+        } else {
+            res.status(405).json({ success: false, error: "Method not allowed" });
         }
-    } else {
-        res.status(400).json({ success: false, error: "Invalid request method" });
-    }
-};
-
+    });
+}

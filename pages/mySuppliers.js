@@ -22,29 +22,25 @@ const Suppliers = () => {
   }, []);
 
   const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      for (const key in data) {
-        if (key === 'documents' || key === 'profilePicture') {
-          for (const fileKey in data[key]) {
-            if (data[key][fileKey][0]) {
-              formData.append(`${key}[${fileKey}]`, data[key][fileKey][0]);
-            }
-          }
-        } else {
-          formData.append(key, data[key]);
-        }
+    const formData = new FormData();
+    Object.keys(data).forEach((key) => {
+      if (key === 'documents') {
+        Object.keys(data.documents).forEach((docKey) => {
+          formData.append(`documents[${docKey}]`, data.documents[docKey][0]);
+        });
+      } else {
+        formData.append(key, data[key]);
       }
+    });
+    formData.append('profilePicture', data.profilePicture[0]);
 
-      await axios.post('/api/supplier', formData, {
+    try {
+      const res = await axios.post('/api/supplier', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-
-      fetchSuppliers();
-      reset();
-      setShowForm(false);
+      console.log('Supplier added successfully:', res.data);
     } catch (error) {
       console.error('Error adding supplier:', error);
     }

@@ -1,7 +1,10 @@
 import connectToDatabase from '@/mongoose/mongodbUser';
 import User from '@/model/usersModel';
 
-export default async function handler(req,res){
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
     await connectToDatabase();
     const { customerId } = req.query;
 
@@ -40,4 +43,5 @@ export default async function handler(req,res){
     } else {
         res.status(405).json({ message: 'Method not allowed' });
     }
+})
 };

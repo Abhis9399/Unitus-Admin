@@ -4,8 +4,10 @@ import mongoose from 'mongoose';
 import Order from '@/model/order';
 import Enquiry from '@/model/enquiryModel';
 import User from '@/model/usersModel';
+import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
 
-export default async function handler(req,res){
+export default async function handler(req, res) {
+    await corsMiddleware(req, res, async () => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -56,4 +58,5 @@ export default async function handler(req,res){
   } finally {
     await mongoose.disconnect();
   }
+})
 }
