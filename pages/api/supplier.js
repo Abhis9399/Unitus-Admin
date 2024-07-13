@@ -1,110 +1,95 @@
-import dbConnect from '@/mongoose/mongodbUser';
-import Supplier from '@/model/supplier';
-import nextConnect from 'next-connect';
-import multer from 'multer';
-import path from 'path';
+// pages/api/supplier.js
+import dbConnect from '@/mongoose/mongodbUser'; // Your db connection logic
+import Supplier from '@/model/supplier'; // Import the Supplier model
+const formidable= require('formidable'); // For handling file uploads
 import fs from 'fs';
+import corsMiddleware from '@/utilis/cors'
+import jwt, { decode } from 'jsonwebtoken'
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadPath = path.join(process.cwd(), 'public', 'uploads');
-        if (!fs.existsSync(uploadPath)) {
-            fs.mkdirSync(uploadPath, { recursive: true });
-        }
-        cb(null, uploadPath);
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-
-const upload = multer({ storage });
-
-const handler = nextConnect();
-
-
-
-handler.use(upload.fields([
-    { name: 'profilePicture', maxCount: 1 },
-    { name: 'documents[panCard]', maxCount: 1 },
-    { name: 'documents[aadhar]', maxCount: 1 },
-    { name: 'documents[gst]', maxCount: 1 },
-    { name: 'documents[cancelledCheck]', maxCount: 1 },
-    { name: 'documents[registrationCertificate]', maxCount: 1 },
-    { name: 'documents[productCertificate]', maxCount: 1 },
-]));
-
-handler.get(async (req, res) => {
-    await dbConnect();
-
-    try {
-        const suppliers = await Supplier.find();
-        res.status(200).json({ success: true, data: suppliers });
-    } catch (error) {
-        res.status(500).json({ success: false, error: 'Error fetching suppliers' });
-    }
-});
-
-handler.post(async (req, res) => {
-    await dbConnect();
-
-    try {
-        const {
-            representativeName,
-            contact,
-            companyName,
-            location,
-            address,
-            mapLink,
-            materialType,
-            annualTurnover,
-            numberOfEmployees,
-            relationshipLevel,
-            relationshipYears,
-            inHouseLogistics,
-        } = req.body;
-
-        const newSupplier = new Supplier({
-            representativeName,
-            contact,
-            companyName,
-            location,
-            address,
-            mapLink,
-            materialType,
-            annualTurnover,
-            numberOfEmployees,
-            relationshipLevel,
-            relationshipYears,
-            inHouseLogistics,
-            profilePicture: req.files['profilePicture'][0].path,
-            documents: {
-                panCard: req.files['documents[panCard]'][0].path,
-                aadhar: req.files['documents[aadhar]'][0].path,
-                gst: req.files['documents[gst]'][0].path,
-                cancelledCheck: req.files['documents[cancelledCheck]'][0].path,
-                registrationCertificate: req.files['documents[registrationCertificate]'][0].path,
-                productCertificate: req.files['documents[productCertificate]'][0].path,
-                bankDetails: {
-                    accountNumber: req.body['documents[bankDetails][accountNumber]'],
-                    ifsc: req.body['documents[bankDetails][ifsc]'],
-                    bankName: req.body['documents[bankDetails][bankName]'],
-                },
-            },
-        });
-
-        await newSupplier.save();
-        res.status(201).json({ success: true, data: newSupplier });
-    } catch (error) {
-        console.error(error);
-        res.status(400).json({ success: false, error: 'Error creating supplier' });
-    }
-});
-
+// Disable Next.js's default body parsing to handle multipart/form-data
 export const config = {
     api: {
-        bodyParser: false, // Disallow body parsing, consume as stream
+        bodyParser: false,
     },
 };
 
-export default handler;
+export default async function handler(req, res) {
+    corsMiddleware(req, res, async () => {
+        await dbConnect();
+
+        if (req.method === 'POST') {
+            await dbConnect();
+            const form = new formidable.IncomingForm({ multiples: true });
+
+            form.parse(req, async (err, fields, files) => {
+                if (err) {
+                    return res.status(500).json({ error: 'Error parsing the files' });
+                }
+
+                console.log('Parsed Fields:', fields); // Log fields to check structure
+
+                const profilePicture = files.profilePicture ? files.profilePicture.filepath : '';
+
+          
+
+                const supplierData = {
+                    representativeName: fields.representativeName,
+                    contact: fields.contact,
+                    companyName: fields.companyName,
+                    address: fields.address,
+                    mapLink: fields.mapLink,
+                    city: fields.city,
+                    state: fields.state,
+                    pincode: fields.pincode,
+                    materialType : fields.materialType,
+                    panNumber: fields.panNumber,
+                    gstNumber: fields.gstNumber,
+                    aadharNumber: fields.aadharNumber,
+                    profilePicture,
+                };
+
+                try {
+                    const supplier = new Supplier(supplierData);
+                    await supplier.save();
+                    return res.status(200).json({ message: 'Supplier created successfully', supplier });
+                } catch (error) {
+                    console.error('Error creating supplier:', error);
+                    return res.status(400).json({ error: 'Error creating supplier', details: error.message });
+                }
+            });
+        } 
+        else if (req.method === 'GET') {
+            // Fetching the supplier information
+            if (!req.headers.authorization) {
+                return res.status(401).json({ success: false, error: 'Unauthorized - Missing token' });
+              }
+        
+              const token = req.headers.authorization?.replace('Bearer ', '');
+              console.log(token);
+              const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+              if (!decodedToken.id) {
+                return res.status(401).json({ success: false, error: 'Unauthorized' });
+              }
+        
+              console.log(decodedToken)
+        
+              const supplierId = decodedToken.id;
+              console.log(supplierId)
+
+            try {
+                const supplier = await Supplier.findById(supplierId);
+                if (!supplier) {
+                    return res.status(404).json({ error: 'Supplier not found' });
+                }
+                return res.status(200).json({ supplier });
+            } catch (error) {
+                console.error('Error fetching supplier:', error);
+                return res.status(500).json({ error: 'Error fetching supplier', details: error.message });
+            }
+        }
+
+        else {
+            return res.status(405).json({ error: 'Method not allowed' });
+        }
+    })
+}

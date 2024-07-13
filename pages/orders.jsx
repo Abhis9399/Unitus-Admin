@@ -1,66 +1,125 @@
-import React from "react";
-import { FaShoppingBag } from "react-icons/fa";
-import { BsThreeDotsVertical } from "react-icons/bs";
-import { data } from "../data/data.js";
+import React, { useState } from 'react';
+import Order from '@/model/order';
+import mongoose from 'mongoose';
 
-const orders = () => {
+const OrdersPage = ({ initialOrders }) => {
+  const [orders, setOrders] = useState(initialOrders);
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
+
+  const handleExpandOrder = (orderId) => {
+    setExpandedOrderId((prevId) => (prevId === orderId ? null : orderId));
+  };
+
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="flex justify-between px-4 pt-4">
-        <h2>Orders</h2>
-        <h2>Welcome Back, Yash</h2>
-      </div>
-      <div className="p-4">
-        <div className="w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto">
-          <div className="my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer">
-            <span>Order</span>
-            <span className="sm:text-left text-right">Status</span>
-            <span className="hidden md:grid">Last Order</span>
-            <span className="hidden sm:grid">Method</span>
-          </div>
-          <ul>
-            {data.map((order, id) => (
-              <li
-                key={id}
-                className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-2 grid 
-                            md:grid-cols-4 sm:grid-cols-3 items-center justify-between cursor-pointer"
-              >
-                <div className="flex">
-                  <div className="bg-purple-100 p-3 rounded-lg">
-                    <FaShoppingBag className="text-purple-800" />
-                  </div>
-                  <div className="pl-4">
-                    <p className="text-gray-800 font-bold">
-                      ${order.total.toLocaleString()}
-                    </p>
-                    <p className="text-gray-800 text-sm">{order.name.first}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 sm:text-left text-right">
-                  <span
-                    className={
-                      order.status == "Completed"
-                        ? "bg-green-200 p-2 rounded-lg"
-                        : order.status == "Processing"
-                        ? "bg-blue-200 p-2 rounded-lg"
-                        : "bg-yellow-200 p-2 rounded-lg"
-                    }
-                  >
-                    {order.status}
-                  </span>
-                </p>
-                <p className="hidden md:flex">{order.date}</p>
-                <div className="sm:flex hidden justify-between items-center">
-                  <p>{order.method}</p>
-                  <BsThreeDotsVertical />
-                </div>
-              </li>
+      <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 p-4 md:p-8">
+      <h2 className="text-2xl md:text-4xl font-extrabold text-gray-800 mb-4 md:mb-6">Orders</h2>
+      <div className="bg-gray-50 min-h-screen p-4">
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white rounded-xl shadow-xl overflow-hidden">
+          <thead className="bg-gradient-to-r from-gray-200 to-gray-400 text-gray-800">
+            <tr>
+            <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+            Order ID
+              </th>
+              <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+              Customer ID
+              </th>
+              <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+              Sub-Products
+              </th>
+              <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
+              Total Price
+              </th>
+              </tr>
+            </thead>
+            <tbody>
+            {orders.map((order) => (
+              <React.Fragment key={order._id}>
+                {/* Main Row */}
+                <tr
+                  className="hover:bg-gray-100 transition cursor-pointer"
+                  onClick={() => handleExpandOrder(order._id)}
+                >
+                  <td className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">{order._id}</td>
+                  <td className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">{order.customer}</td>
+                  <td className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">
+                    {order.subProducts.map((sp, index) => (
+                      <div key={index} className="mb-1 md:mb-2">
+                        <div className="font-medium text-xs md:text-sm">
+                          Name: <span className="font-normal">{sp.name}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </td>
+
+                  <td className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">{order.totalPrice}</td>
+                
+                </tr>
+                {/* Expanded Row */}
+                {expandedOrderId === order._id && (
+                  <tr>
+                    <td colSpan="4" className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">
+                      <div className="bg-gray-100 p-2 md:p-4 rounded-md">
+                        <h3 className="text-sm md:text-lg font-semibold mb-1 md:mb-2">Full Details</h3>
+                        <div className="mb-1 md:mb-2">
+                          <strong>Sub-Products:</strong>
+                          {order.subProducts.map((sp, index) => (
+                            <div key={index} className="ml-2">
+                              {/* <div className="font-medium text-xs md:text-sm">
+                                Name:{' '}
+                                <span className="font-normal">{sp.name}</span>
+                              </div> */}
+                              <div className="font-medium text-xs md:text-sm">
+                                Quantity:{' '}
+                                <span className="font-normal">{sp.quantity}</span>
+                              </div>
+                              <div className="font-medium text-xs md:text-sm">
+                                Brand:{' '}
+                                <span className="font-normal">{sp.brandName}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mb-1 md:mb-2">
+                          <strong>Deadline:</strong>{' '}
+                          {new Date(order.deadline).toLocaleDateString()}
+                        </div>
+                        <div className="mb-1 md:mb-2">
+                        <strong>Payment Method:</strong>{' '}
+                        {order.paymentTerms}
+                        </div>
+                        <div className="mb-1 md:mb-2">
+                        <strong>Site Address:</strong>{' '}
+                        {order.siteAddress}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
-          </ul>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
 
-export default orders;
+export async function getServerSideProps() {
+  await mongoose.connect(process.env.MONGODB_URL_USER, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  const orders = await Order.find({}).lean();
+
+  return {
+    props: {
+      initialOrders: JSON.parse(JSON.stringify(orders)),
+    },
+  };
+}
+
+
+export default OrdersPage;

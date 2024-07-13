@@ -1,46 +1,36 @@
-// pages/admin/suppliers.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import supplier from '@/model/supplier';
+import mongoose from 'mongoose';
 
-const Suppliers = () => {
+const Suppliers = ({initialSuppliers}) => {
   const { register, handleSubmit, reset } = useForm();
   const [suppliers, setSuppliers] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchSuppliers = async () => {
-    try {
-      const response = await axios.get('/api/supplier');
-      setSuppliers(response.data.data);
-    } catch (error) {
-      console.error('Error fetching suppliers:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
+
+    // Append basic fields
     Object.keys(data).forEach((key) => {
-      if (key === 'documents') {
-        Object.keys(data.documents).forEach((docKey) => {
-          formData.append(`documents[${docKey}]`, data.documents[docKey][0]);
-        });
-      } else {
         formData.append(key, data[key]);
-      }
+
     });
+
+    // Append profile picture
     formData.append('profilePicture', data.profilePicture[0]);
 
     try {
       const res = await axios.post('/api/supplier', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
       console.log('Supplier added successfully:', res.data);
+      // Optionally reset the form after successful submission
+      reset();
     } catch (error) {
       console.error('Error adding supplier:', error);
     }
@@ -68,7 +58,7 @@ const Suppliers = () => {
             <input
               type="text"
               {...register('contact')}
-              placeholder="Contact"
+              placeholder="Contact Number"
               className="p-2 border rounded w-full"
             />
             <input
@@ -79,58 +69,60 @@ const Suppliers = () => {
             />
             <input
               type="text"
-              {...register('location')}
-              placeholder="Location"
-              className="p-2 border rounded w-full"
-            />
-            <input
-              type="text"
               {...register('address')}
-              placeholder="Address"
+              placeholder="Company Address"
               className="p-2 border rounded w-full"
             />
             <input
               type="url"
               {...register('mapLink')}
-              placeholder="Map Link"
+              placeholder="Company Map Link"
               className="p-2 border rounded w-full"
             />
             <input
+              type="text"
+              {...register('city')}
+              placeholder="City"
+              className="p-2 border rounded w-full"
+            />
+            <input
+              type="text"
+              {...register('state')}
+              placeholder="State"
+              className="p-2 border rounded w-full"
+            />
+            <input
+              type="text"
+              {...register('pincode')}
+              placeholder="Pincode"
+              className="p-2 border rounded w-full"
+            />
+              <input
               type="text"
               {...register('materialType')}
               placeholder="Material Type"
               className="p-2 border rounded w-full"
             />
+
             <input
               type="text"
-              {...register('annualTurnover')}
-              placeholder="Annual Turnover"
+              {...register('panNumber')}
+              placeholder="PAN Number"
               className="p-2 border rounded w-full"
             />
             <input
-              type="number"
-              {...register('numberOfEmployees')}
-              placeholder="Number of Employees"
+              type="text"
+              {...register('gstNumber')}
+              placeholder="GST Number"
               className="p-2 border rounded w-full"
             />
             <input
-              type="number"
-              {...register('relationshipLevel')}
-              placeholder="Relationship Level (1-10)"
+              type="text"
+              {...register('aadharNumber')}
+              placeholder="Aadhar Number"
               className="p-2 border rounded w-full"
             />
-            <input
-              type="number"
-              {...register('relationshipYears')}
-              placeholder="Relationship Years"
-              className="p-2 border rounded w-full"
-            />
-            <select {...register('inHouseLogistics')} className="p-2 border rounded w-full">
-              <option value="">In-house Logistics</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-              <option value="don't know">Don't Know</option>
-            </select>
+          
 
             <div className="col-span-1 md:col-span-2">
               <label className="block mb-2 font-semibold">Profile Picture</label>
@@ -141,44 +133,15 @@ const Suppliers = () => {
               />
             </div>
 
-            <div className="col-span-1 md:col-span-2">
-              <label className="block mb-2 font-semibold">Documents</label>
-              {['panCard', 'aadhar', 'gst', 'cancelledCheck', 'registrationCertificate', 'productCertificate'].map(doc => (
-                <div key={doc} className="mb-2">
-                  <label className="block mb-1 font-semibold capitalize">{doc.replace(/([A-Z])/g, ' $1')}</label>
-                  <input
-                    type="file"
-                    {...register(`documents.${doc}`)}
-                    className="p-2 border rounded w-full"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="col-span-1 md:col-span-2">
-              <label className="block mb-2 font-semibold">Bank Details</label>
-              <input
-                type="text"
-                {...register('documents.bankDetails.accountNumber')}
-                placeholder="Bank Account Number"
-                className="p-2 border rounded w-full mb-2"
-              />
-              <input
-                type="text"
-                {...register('documents.bankDetails.ifsc')}
-                placeholder="Bank IFSC"
-                className="p-2 border rounded w-full mb-2"
-              />
-              <input
-                type="text"
-                {...register('documents.bankDetails.bankName')}
-                placeholder="Bank Name"
-                className="p-2 border rounded w-full mb-2"
-              />
-            </div>
+            {/* Include other documents input as needed */}
+
+            <button
+              type="submit"
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
+            >
+              Add Supplier
+            </button>
           </div>
-          <button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600">
-            Add Supplier
-          </button>
         </form>
       )}
 
@@ -190,19 +153,21 @@ const Suppliers = () => {
               <th className="py-2 px-4 border">Name</th>
               <th className="py-2 px-4 border">Contact</th>
               <th className="py-2 px-4 border">Company Name</th>
-              <th className="py-2 px-4 border">Location</th>
+              <th className="py-2 px-4 border">Material-Type</th>
               <th className="py-2 px-4 border">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {suppliers.map((supplier) => (
+            {initialSuppliers.map((supplier) => (
               <tr key={supplier._id}>
                 <td className="border px-4 py-2">{supplier.representativeName}</td>
                 <td className="border px-4 py-2">{supplier.contact}</td>
                 <td className="border px-4 py-2">{supplier.companyName}</td>
-                <td className="border px-4 py-2">{supplier.location}</td>
+                <td className="border px-4 py-2">{supplier.materialType}</td>
                 <td className="border px-4 py-2">
-                  <button className="bg-green-500 text-white px-2 py-1 rounded">View</button>
+                  <button className="bg-green-500 text-white px-2 py-1 rounded">
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
@@ -212,5 +177,20 @@ const Suppliers = () => {
     </div>
   );
 };
+export async function getServerSideProps() {
+  await mongoose.connect(process.env.MONGODB_URL_USER, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  const suppliers = await supplier.find({}).lean();
+  
+  return {
+    props: {
+      initialSuppliers: JSON.parse(JSON.stringify(suppliers)),
+    },
+  };
+}
+
 
 export default Suppliers;

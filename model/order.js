@@ -27,6 +27,7 @@ const orderSchema = new mongoose.Schema({
       brandName: String
     }
   ],
+  materialType: String,
   deadline: Date,
   frequency: String,
   siteAddress: String,

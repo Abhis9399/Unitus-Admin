@@ -2,6 +2,7 @@ import User from "@/model/Admin";
 import connectDb from "@/mongoose/mongodbUser";
 import jwt from 'jsonwebtoken';
 import CryptoJS from "crypto-js";
+import { setCookie } from 'nookies';
 import corsMiddleware from '@/utilis/cors';// Make sure the path is correct
 
 export default async function handler(req, res) {
@@ -33,6 +34,14 @@ export default async function handler(req, res) {
                 const token = jwt.sign({ email: existingUser.email, name: existingUser.name }, process.env.JWT_SECRET, {
                     expiresIn: '2d'
                 });
+
+                console.log(token);
+
+                setCookie({ res }, 'token', token, {
+                    maxAge: 30 * 24 * 60 * 60, // 30 days
+                    path: '/',
+                });
+
                 res.status(200).json({ success: true, token });
             } catch (error) {
                 console.error("Error in login:", error);

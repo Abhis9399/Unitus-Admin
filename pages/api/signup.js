@@ -5,9 +5,10 @@ import corsMiddleware from '@/utilis/cors' // Ensure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-        await connectDb();
-        
+       
         if (req.method === 'POST') {
+            await connectDb();
+        
             console.log(req.body);
 
             const { name, email, phone, password, confirmPassword } = req.body;
