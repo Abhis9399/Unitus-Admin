@@ -27,7 +27,7 @@ const Forgot = () => {
 
     const sendResetEmail = async () => {
         try {
-            let response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/forgot`, {
+            let response = await fetch('/api/forgot', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const Forgot = () => {
                 token: router.query.token
             };
             try {
-                let response = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/forgot`, {
+                let response = await fetch('/api/forgot', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
