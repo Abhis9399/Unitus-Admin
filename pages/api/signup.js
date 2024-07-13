@@ -1,7 +1,7 @@
 import connectDb from "@/mongoose/mongodbUser";
 import User from "@/model/Admin";
 import CryptoJS from "crypto-js";
-import corsMiddleware from '@/utils/cors'; // Ensure the path is correct
+import corsMiddleware from '@/utilis/cors' // Ensure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {

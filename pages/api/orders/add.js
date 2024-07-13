@@ -1,7 +1,7 @@
 import dbConnect from '@/mongoose/mongodbUser';
 import Order from '@/model/order';
 import Customer from '@/model/customer';
-import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {

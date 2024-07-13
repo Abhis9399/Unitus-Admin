@@ -2,7 +2,7 @@ import User from "@/model/Admin";
 import connectDb from "@/mongoose/mongodbUser";
 import jwt from 'jsonwebtoken';
 import CryptoJS from "crypto-js";
-import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+import corsMiddleware from '@/utilis/cors';// Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {

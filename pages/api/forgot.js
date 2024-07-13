@@ -4,7 +4,7 @@ import User from '@/model/Admin';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+import corsMiddleware from '@/utilis/cors'// Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Enquiry from '@/model/enquiryModel';
 import Item from '@/model/item'; // Adjust the import path as per your project structure
-import corsMiddleware from '@/utils/cors'; // Make sure the path is correct
+import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
