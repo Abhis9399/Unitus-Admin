@@ -1,34 +1,25 @@
-import connectToDatabase from '@/mongoose/mongodbUser';
-import User from '@/model/usersModel';
+// pages/api/orders/index.js
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import Order from '@/model/order';
-import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
-
-export default async function handler(req, res) {
-    await corsMiddleware(req, res, async () => {
+import connectToDatabase from '@/mongoose/mongodbUser';
+export default async function handler(req,res){
   await connectToDatabase();
-  const { enquiryId, price, customerId } = req.body;
-
+ 
   try {
-    await connectToDatabase();
+    if (req.method === 'GET') {
+      await mongoose.connect(process.env.MONGODB_URL_USER, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
 
-    const user = await User.findById(customerId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      const orders = await Order.find({}).sort({ createdAt: -1 }).lean();
+      res.status(200).json(orders);
+    } else {
+      res.status(405).json({ error: 'Method not allowed' });
     }
-
-    const newOrder = {
-      enquiryId,
-      price,
-      date: new Date(),
-    };
-
-    user.orders.push(newOrder);
-    await user.save();
-
-    res.status(201).json({ message: 'Order generated successfully', order: newOrder });
   } catch (error) {
-    console.error('Error generating order:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-})
-};
+}

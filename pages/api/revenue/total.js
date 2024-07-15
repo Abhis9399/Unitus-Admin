@@ -5,9 +5,10 @@ import corsMiddleware from '@/utilis/cors'// Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-  await connectDb();
+  
   
   try {
+    await connectDb();
     const totalRevenue = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalPrice" } } }
     ]);

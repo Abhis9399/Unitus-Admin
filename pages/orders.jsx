@@ -11,11 +11,12 @@ const OrdersPage = ({ initialOrders }) => {
   };
 
   return (
-      <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 p-4 md:p-8">
+      // <div className="min-w-screen min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 px-5 py-5 w-full overflow-hidden">
+      <>
       <h2 className="text-2xl md:text-4xl font-extrabold text-gray-800 mb-4 md:mb-6">Orders</h2>
       <div className="bg-gray-50 min-h-screen p-4">
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white rounded-xl shadow-xl overflow-hidden">
+      <div className="overflow-y-auto">
+        <table className="min-w-full bg-white rounded-xl shadow-xl overflow-y-auto">
           <thead className="bg-gradient-to-r from-gray-200 to-gray-400 text-gray-800">
             <tr>
             <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
@@ -102,7 +103,8 @@ const OrdersPage = ({ initialOrders }) => {
           </table>
         </div>
       </div>
-    </div>
+      </>
+    // </div>
   );
 };
 

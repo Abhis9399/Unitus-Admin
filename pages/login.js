@@ -153,7 +153,7 @@ const Login = () => {
             </form>
 
             <div className='text-center mb-10'>
-            <div className='mb-8 hover:text-blue-600 '> <Link href={'/forgot'}>Forgot Credentials</Link></div>
+            {/* <div className='mb-8 hover:text-blue-600 '> <Link href={'/forgot'}>Forgot Credentials</Link></div> */}
               <p>Don't have an account?</p>
               <Link className=' hover:text-blue-600  p-2' href={'/signup'}>Register Here</Link>
             </div>

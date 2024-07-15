@@ -57,7 +57,7 @@ const TopCards = () => {
       </div>
       <div className="bg-white shadow-lg rounded-lg p-6 flex justify-between items-center">
         <div className="flex flex-col">
-          <p className="text-3xl font-bold text-gray-900">{totalCustomers.toLocaleString()}</p>
+          <p className="text-3xl font-bold text-gray-900">{totalCustomers?totalCustomers.toLocaleString():0}</p>
           <p className="text-gray-600">Customers</p>
         </div>
         <div className="bg-green-100 text-green-700 p-3 rounded-full">

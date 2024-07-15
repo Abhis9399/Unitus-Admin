@@ -28,11 +28,26 @@ const CustomerEnquiries = ({ customerId }) => {
         isDealDone,
       });
       console.log('Order created:', response.data);
-      setSelectedEnquiry(null); // Reset selected enquiry
+  
+      // Now delete the enquiry from the database
+     
+  
+      // Remove the converted enquiry from the state
+      setEnquiries((prevEnquiries) =>
+        prevEnquiries.filter((enquiry) => enquiry._id !== enquiryId)
+      );
+
+      await axios.delete(`/api/enquiries/${enquiryId}`);
+  
+      // Reset selected enquiry and form fields
+      setSelectedEnquiry(null);
+      setTotalPrice('');
+      setIsDealDone(false);
     } catch (error) {
       console.error('Error converting enquiry to order:', error);
     }
   };
+  
 
   return (
     <div className="mt-4">
@@ -50,20 +65,18 @@ const CustomerEnquiries = ({ customerId }) => {
               ))}
             </ul>
             <p><strong>Date:</strong> {new Date(enquiry.createdAt).toLocaleDateString()}</p>
-            
             <p><strong>Deadline:</strong> {enquiry.deadline ? new Date(enquiry.deadline).toLocaleDateString() : 'Not specified'}</p>
             <p><strong>Frequency:</strong> {enquiry.frequency}</p>
             <p><strong>Certificates:</strong> {enquiry.certificates}</p>
             <p><strong>Payment Terms:</strong> {enquiry.paymentTerms}</p>
             <p><strong>Site Address:</strong> {enquiry.siteAddress}</p>
-            <button onClick={() => setSelectedEnquiry(enquiry._id)}>Convert to Order</button>
+            <button className="block w-full p-2 bg-green-500 text-white rounded-md shadow-sm" onClick={() => setSelectedEnquiry(enquiry._id)}>Add Price</button>
           </li>
         ))}
       </ul>
 
       {selectedEnquiry && (
         <div className="mt-4 p-4 border rounded-md">
-          <h3 className="text-lg font-bold">Convert Enquiry to Order</h3>
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -93,7 +106,7 @@ const CustomerEnquiries = ({ customerId }) => {
             </div>
             <button
               type="submit"
-              className="mt-2 p-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-700"
+              className="block w-full p-2 bg-green-500 text-white rounded-md shadow-sm"
             >
               Convert to Order
             </button>

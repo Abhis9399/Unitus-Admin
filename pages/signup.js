@@ -12,21 +12,13 @@ const Signup = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const router = useRouter();
 
-    useEffect(() => {
-        if (localStorage.getItem('token')) {
-            router.push('/');
-        }
-    }, [router]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'name') setName(value);
         else if (name === 'email') setEmail(value);
+        else if (name === 'phone') setPhone(value);
         else if (name === 'password') setPassword(value);
         else if (name === 'confirmPassword') setConfirmPassword(value);
-        else if (name === 'phone') {
-            setPhone(value);
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -47,7 +39,7 @@ const Signup = () => {
             return;
         }
 
-        const data = { name, email, phone,password };
+        const data = { name, email, phone, password };
 
         try {
             const res = await fetch('/api/signup', {
@@ -60,18 +52,20 @@ const Signup = () => {
 
             if (!res.ok) {
                 const errorResponse = await res.json();
-                throw new Error(errorResponse.message || 'Something went wrong!');
+                throw new Error(errorResponse.error || 'Something went wrong!');
             }
 
             const response = await res.json();
-            console.log(response);
-            router.push('/')
+
+            localStorage.setItem('token', response.token);
+
+            router.push('/');
 
             setName('');
             setEmail('');
+            setPhone('');
             setPassword('');
             setConfirmPassword('');
-            setPhone('')
 
             toast.success('Successfully created your account!', {
                 position: "bottom-center",
@@ -118,7 +112,15 @@ const Signup = () => {
                                         <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
                                             <i className="mdi mdi-email-outline text-gray-400 text-lg"></i>
                                         </div>
-                                        <input type="text" onChange={handleChange} id='name' name='name' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="Name" />
+                                        <input
+                                            type="text"
+                                            onChange={handleChange}
+                                            value={name}
+                                            id='name'
+                                            name='name'
+                                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                                            placeholder="Name"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +131,15 @@ const Signup = () => {
                                         <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
                                             <i className="mdi mdi-email-outline text-gray-400 text-lg"></i>
                                         </div>
-                                        <input type="email" onChange={handleChange} id='email' name='email' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="abhi@example.com" />
+                                        <input
+                                            type="email"
+                                            onChange={handleChange}
+                                            value={email}
+                                            id='email'
+                                            name='email'
+                                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                                            placeholder="abhi@example.com"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -140,7 +150,15 @@ const Signup = () => {
                                         <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
                                             <i className="mdi mdi-email-outline text-gray-400 text-lg"></i>
                                         </div>
-                                        <input type="number" onChange={handleChange} id='phone' name='phone' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="your mobile number " />
+                                        <input
+                                            type="number"
+                                            onChange={handleChange}
+                                            value={phone}
+                                            id='phone'
+                                            name='phone'
+                                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                                            placeholder="your mobile number"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -151,7 +169,15 @@ const Signup = () => {
                                         <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
                                             <i className="mdi mdi-lock-outline text-gray-400 text-lg"></i>
                                         </div>
-                                        <input type="password" onChange={handleChange} id='password' name='password' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="********" />
+                                        <input
+                                            type="password"
+                                            onChange={handleChange}
+                                            value={password}
+                                            id='password'
+                                            name='password'
+                                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                                            placeholder="********"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -162,14 +188,26 @@ const Signup = () => {
                                         <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
                                             <i className="mdi mdi-lock-outline text-gray-400 text-lg"></i>
                                         </div>
-                                        <input type="password" onChange={handleChange} id='confirmPassword' name='confirmPassword' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="********" />
+                                        <input
+                                            type="password"
+                                            onChange={handleChange}
+                                            value={confirmPassword}
+                                            id='confirmPassword'
+                                            name='confirmPassword'
+                                            className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
+                                            placeholder="********"
+                                        />
                                     </div>
                                 </div>
                             </div>
                             <div className="flex -mx-3">
                                 <div className="w-full px-3 mb-5">
-                                    <button type="submit" className="block w-full bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white font-semibold rounded-lg
-                px-3 py-3 mt-4">SIGN UP</button>
+                                    <button
+                                        type="submit"
+                                        className="block w-full bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white font-semibold rounded-lg px-3 py-3 mt-4"
+                                    >
+                                        SIGN UP
+                                    </button>
                                 </div>
                             </div>
                         </form>

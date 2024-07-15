@@ -1,26 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import supplier from '@/model/supplier';
 import mongoose from 'mongoose';
+import SupplierModal from '@/components/supplier'; // Import your modal
 
-const Suppliers = ({initialSuppliers}) => {
+const Suppliers = ({ initialSuppliers }) => {
   const { register, handleSubmit, reset } = useForm();
-  const [suppliers, setSuppliers] = useState([]);
   const [showForm, setShowForm] = useState(false);
-
+  const [selectedSupplier, setSelectedSupplier] = useState(null); // State for selected supplier
 
   const onSubmit = async (data) => {
     const formData = new FormData();
 
-    // Append basic fields
     Object.keys(data).forEach((key) => {
-        formData.append(key, data[key]);
-
+      formData.append(key, data[key]);
     });
-
-    // Append profile picture
-    formData.append('profilePicture', data.profilePicture[0]);
 
     try {
       const res = await axios.post('/api/supplier', formData, {
@@ -29,7 +24,6 @@ const Suppliers = ({initialSuppliers}) => {
         },
       });
       console.log('Supplier added successfully:', res.data);
-      // Optionally reset the form after successful submission
       reset();
     } catch (error) {
       console.error('Error adding supplier:', error);
@@ -37,7 +31,7 @@ const Suppliers = ({initialSuppliers}) => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="min-h-screen bg-gradient-to-r from-gray-100 to-gray-300 p-4 md:p-8">
       <h1 className="text-2xl font-semibold mb-6">Manage Suppliers</h1>
       <button
         onClick={() => setShowForm(!showForm)}
@@ -49,7 +43,7 @@ const Suppliers = ({initialSuppliers}) => {
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="mb-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
+          <input
               type="text"
               {...register('representativeName')}
               placeholder="Representative Name"
@@ -97,13 +91,12 @@ const Suppliers = ({initialSuppliers}) => {
               placeholder="Pincode"
               className="p-2 border rounded w-full"
             />
-              <input
+            <input
               type="text"
               {...register('materialType')}
               placeholder="Material Type"
               className="p-2 border rounded w-full"
             />
-
             <input
               type="text"
               {...register('panNumber')}
@@ -122,19 +115,16 @@ const Suppliers = ({initialSuppliers}) => {
               placeholder="Aadhar Number"
               className="p-2 border rounded w-full"
             />
-          
-
-            <div className="col-span-1 md:col-span-2">
+            {/* <div className="col-span-1 md:col-span-2">
               <label className="block mb-2 font-semibold">Profile Picture</label>
               <input
                 type="file"
-                {...register('profilePicture')}
+                 {...register('profilePicture', { required: true })}
                 className="p-2 border rounded w-full"
               />
-            </div>
+            </div> */}
 
             {/* Include other documents input as needed */}
-
             <button
               type="submit"
               className="mt-4 bg-blue-500 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
@@ -146,14 +136,14 @@ const Suppliers = ({initialSuppliers}) => {
       )}
 
       <h2 className="text-xl font-semibold mb-4">All Suppliers</h2>
-      <div className="overflow-x-auto">
+      <div className="w-full m-auto p-4 border rounded-lg bg-white overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead>
             <tr>
               <th className="py-2 px-4 border">Name</th>
               <th className="py-2 px-4 border">Contact</th>
               <th className="py-2 px-4 border">Company Name</th>
-              <th className="py-2 px-4 border">Material-Type</th>
+              <th className="py-2 px-4 border">Material Type</th>
               <th className="py-2 px-4 border">Actions</th>
             </tr>
           </thead>
@@ -165,7 +155,10 @@ const Suppliers = ({initialSuppliers}) => {
                 <td className="border px-4 py-2">{supplier.companyName}</td>
                 <td className="border px-4 py-2">{supplier.materialType}</td>
                 <td className="border px-4 py-2">
-                  <button className="bg-green-500 text-white px-2 py-1 rounded">
+                  <button
+                    onClick={() => setSelectedSupplier(supplier)}
+                    className="bg-green-500 text-white px-2 py-1 rounded"
+                  >
                     View
                   </button>
                 </td>
@@ -174,9 +167,17 @@ const Suppliers = ({initialSuppliers}) => {
           </tbody>
         </table>
       </div>
+
+      {selectedSupplier && (
+        <SupplierModal
+          supplier={selectedSupplier}
+          onClose={() => setSelectedSupplier(null)}
+        />
+      )}
     </div>
   );
 };
+
 export async function getServerSideProps() {
   await mongoose.connect(process.env.MONGODB_URL_USER, {
     useNewUrlParser: true,
@@ -184,13 +185,12 @@ export async function getServerSideProps() {
   });
 
   const suppliers = await supplier.find({}).lean();
-  
+
   return {
     props: {
       initialSuppliers: JSON.parse(JSON.stringify(suppliers)),
     },
   };
 }
-
 
 export default Suppliers;

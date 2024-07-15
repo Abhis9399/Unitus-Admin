@@ -1,48 +1,48 @@
 import connectDb from "@/mongoose/mongodbUser";
 import User from "@/model/Admin";
 import CryptoJS from "crypto-js";
-import corsMiddleware from '@/utilis/cors' // Ensure the path is correct
+import corsMiddleware from '@/utilis/cors';
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-       
         if (req.method === 'POST') {
             await connectDb();
-        
-            console.log(req.body);
 
             const { name, email, phone, password, confirmPassword } = req.body;
 
             // Validate input
-            if (!name || !email || !phone || !password || !confirmPassword) {
+            if (!name || !email || !phone || !password) {
                 return res.status(400).json({ error: 'All fields are required.' });
             }
 
-            // Check if passwords match
-            if (password !== confirmPassword) {
-                return res.status(400).json({ error: 'Passwords do not match.' });
+            // Check if user already exists
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ error: 'User already exists' });
             }
+
+
+            // Encrypt passwords
+            const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.AES_SECRET).toString();
+            const encryptedConfirmPassword = CryptoJS.AES.encrypt(confirmPassword, process.env.AES_SECRET).toString();
+
+            // Create and save new user
+            let newUser = new User({
+                name,
+                email,
+                phone,
+                password: encryptedPassword,
+                confirmPassword: encryptedConfirmPassword,
+            });
 
             try {
-                const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.AES_SECRET).toString();
-                
-                let newUser = new User({
-                    name,
-                    email,
-                    phone,
-                    password: encryptedPassword
-                    // Removed confirmPassword
-                });
-                
                 await newUser.save();
-
-                res.status(201).json({ success: "User created successfully" });
+                return res.status(201).json({ success: 'User created successfully' });
             } catch (error) {
-                console.error('Error saving user:', error);
-                res.status(500).json({ error: 'Internal Server Error' });
+                return res.status(500).json({ error: 'Error creating user', details: error.message });
             }
         } else {
-            res.status(405).json({ error: "Method not allowed" });
+            return res.status(405).json({ error: 'Method not allowed' });
         }
     });
 }
