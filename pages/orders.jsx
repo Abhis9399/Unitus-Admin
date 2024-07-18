@@ -16,8 +16,8 @@ const OrdersPage = ({ initialOrders }) => {
       <h2 className="text-2xl md:text-4xl font-extrabold text-gray-800 mb-4 md:mb-6">Orders</h2>
       <div className="bg-gray-50 min-h-screen p-4">
       <div className="overflow-y-auto">
-        <table className="min-w-full bg-white rounded-xl shadow-xl overflow-y-auto">
-          <thead className="bg-gradient-to-r from-gray-200 to-gray-400 text-gray-800">
+        <table className="min-w-full bg-white rounded-xl shadow-xl shadow-blue-900 overflow-y-auto">
+          <thead className="bg-gradient-to-r from-blue-300 to-blue-900 text-gray-800">
             <tr>
             <th className="py-2 md:py-4 px-2 md:px-6 border-b-2 border-gray-300 text-left text-xs md:text-sm font-semibold uppercase tracking-wider">
             Order ID
@@ -59,8 +59,8 @@ const OrdersPage = ({ initialOrders }) => {
                 {/* Expanded Row */}
                 {expandedOrderId === order._id && (
                   <tr>
-                    <td colSpan="4" className="py-2 md:py-4 px-2 md:px-6 border-b border-gray-300">
-                      <div className="bg-gray-100 p-2 md:p-4 rounded-md">
+                    <td colSpan="4" className="py-2 md:py-4 px-2 md:px-6 border-b border-blue-900">
+                      <div className="bg-gradient-to-r from-blue-300 to-blue-900 p-2 md:p-4 rounded-md">
                         <h3 className="text-sm md:text-lg font-semibold mb-1 md:mb-2">Full Details</h3>
                         <div className="mb-1 md:mb-2">
                           <strong>Sub-Products:</strong>

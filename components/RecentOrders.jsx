@@ -51,17 +51,17 @@ const RecentOrders = () => {
   };
 
   return (
-    <div className="w-full col-span-1 relative lg:h-[70vh] h-[50vh] m-auto p-6 border rounded-lg bg-white overflow-scroll shadow-lg">
+    <div className="w-full col-span-1 relative lg:h-[70vh] h-[50vh] m-auto p-6 border rounded-lg bg-white overflow-scroll shadow-md shadow-blue-900">
       <h1 className="text-2xl font-semibold mb-4">Recent Orders</h1>
       <ul>
         {orders.map((order) => (
           <li
             key={order._id}
-            className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-4 flex items-center justify-between cursor-pointer shadow-sm transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md"
+            className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-4 flex items-center justify-between cursor-pointer shadow-sm shadow-blue-900 transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md"
           >
             <div className="flex items-center">
-              <div className="bg-purple-100 rounded-lg p-3">
-                <FaShoppingBag className="text-purple-800" />
+              <div className="bg-blue-100 rounded-lg p-3">
+                <FaShoppingBag className="text-blue-900" />
               </div>
               <div className="pl-4">
                 {order.subProducts.map((sp, index) => (

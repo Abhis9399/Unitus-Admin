@@ -24,10 +24,10 @@ const CustomersPage = ({ initialCustomers }) => {
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-between p-4">
-        <h2>Customers</h2>
+        <h2 >Customers</h2>
         <button
           onClick={navigateToAddCustomer}
-          className="bg-purple-500 p-2 rounded text-white"
+          className="bg-blue-900 p-2 rounded text-white"
         >
           Check Enquiry
         </button>
@@ -46,19 +46,15 @@ const CustomersPage = ({ initialCustomers }) => {
                 className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-2 grid 
                             md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer"
               >
-                <div className="flex items-center">
+                <div onClick={() => toggleOrders(customer._id)} className="flex items-center">
                   <div className="bg-purple-100 p-3 rounded-lg">
-                    <BsPersonFill className="text-purple-800" />
+                    <BsPersonFill className="text-blue-900" />
                   </div>
-                  <p className="pl-4">{customer.name}</p>
+                  <p  className="pl-4">{customer.name}</p>
                 </div>
                 <p className="text-gray-600 sm:text-left text-right">{customer.email}</p>
                 <p className="hidden sm:flex">{customer.phone}</p>
-                <div className="sm:flex hidden justify-end items-center">
-                  <button onClick={() => toggleOrders(customer._id)}>
-                    <BsThreeDotsVertical />
-                  </button>
-                </div>
+       
                 {selectedCustomer === customer._id && (
                   <div className="col-span-4 bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold mb-2">Orders</h3>

@@ -1,6 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+// Define the getSupplierDetails function
+const getSupplierDetails = async (supplierId) => {
+  try {
+    const response = await axios.get(`/api/suppliersDetails?supplierId=${supplierId}`);
+    console.log(response.data);  // Check the entire response
+    return response.data.data;   // Ensure correct access to supplier details
+  } catch (error) {
+    console.error('Error fetching supplier details:', error);
+    return null;
+  }
+};
+
 const CustomerEnquiries = ({ customerId }) => {
   const [enquiries, setEnquiries] = useState([]);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
@@ -11,7 +23,17 @@ const CustomerEnquiries = ({ customerId }) => {
     const fetchEnquiries = async () => {
       try {
         const response = await axios.get(`/api/enquiries?customerId=${customerId}`);
-        setEnquiries(response.data);
+        const enrichedEnquiries = await Promise.all(response.data.map(async (enquiry) => {
+          if (enquiry.requirements && enquiry.requirements.length > 0) {
+            const suppliers = await Promise.all(enquiry.requirements.map(async (requirement) => {
+              const supplierDetails = await getSupplierDetails(requirement.supplierId);
+              return { ...requirement, supplierDetails };
+            }));
+            return { ...enquiry, requirements: suppliers };
+          }
+          return enquiry;
+        }));
+        setEnquiries(enrichedEnquiries);
       } catch (error) {
         console.error('Error fetching enquiries:', error);
       }
@@ -27,28 +49,35 @@ const CustomerEnquiries = ({ customerId }) => {
         totalPrice,
         isDealDone,
       });
-      console.log('Order created:', response.data);
   
-      // Now delete the enquiry from the database
-     
+      console.log('Order creation response:', response.data);
   
-      // Remove the converted enquiry from the state
-      setEnquiries((prevEnquiries) =>
-        prevEnquiries.filter((enquiry) => enquiry._id !== enquiryId)
-      );
-
-      await axios.delete(`/api/enquiries/${enquiryId}`);
+      if (response.data.success) {
+        alert('Order created successfully!');
   
-      // Reset selected enquiry and form fields
-      setSelectedEnquiry(null);
-      setTotalPrice('');
-      setIsDealDone(false);
+        if (enquiryId) {
+          const deleteResponse = await axios.delete(`/api/enquiriesDelete/${enquiryId}`);
+          console.log('Enquiry deletion response:', deleteResponse.data);
+  
+          setEnquiries((prevEnquiries) =>
+            prevEnquiries.filter((enquiry) => enquiry._id !== enquiryId)
+          );
+  
+          setSelectedEnquiry(null);
+          setTotalPrice('');
+          setIsDealDone(false);
+        } else {
+          console.error('Enquiry ID is undefined');
+        }
+      } else {
+        console.error('Order creation failed:', response.data.error);
+      }
     } catch (error) {
       console.error('Error converting enquiry to order:', error);
     }
   };
   
-
+  
   return (
     <div className="mt-4">
       <h2 className="text-xl font-bold mb-2">Customer Enquiries</h2>
@@ -70,6 +99,14 @@ const CustomerEnquiries = ({ customerId }) => {
             <p><strong>Certificates:</strong> {enquiry.certificates}</p>
             <p><strong>Payment Terms:</strong> {enquiry.paymentTerms}</p>
             <p><strong>Site Address:</strong> {enquiry.siteAddress}</p>
+            {enquiry.requirements && enquiry.requirements.map((requirement, index) => (
+              <div key={index}>
+                <p><strong>Supplier Id:</strong> {requirement.supplierId}</p>
+                <p><strong>Supplier:</strong> {requirement.supplierDetails ? requirement.supplierDetails.representativeName : 'Loading...'}</p>
+                <p><strong>Price:</strong> {requirement.price}</p>
+                <p><strong>Message:</strong> {requirement.message}</p>
+              </div>
+            ))}
             <button className="block w-full p-2 bg-green-500 text-white rounded-md shadow-sm" onClick={() => setSelectedEnquiry(enquiry._id)}>Add Price</button>
           </li>
         ))}

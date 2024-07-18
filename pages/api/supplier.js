@@ -5,6 +5,7 @@ const formidable= require('formidable'); // For handling file uploads
 import fs from 'fs';
 import corsMiddleware from '@/utilis/cors'
 import jwt, { decode } from 'jsonwebtoken'
+import CryptoJS from "crypto-js";
 
 // Disable Next.js's default body parsing to handle multipart/form-data
 export const config = {
@@ -30,7 +31,7 @@ export default async function handler(req, res) {
 
                 const profilePicture = files.profilePicture ? files.profilePicture.filepath : '';
 
-          
+                const encryptedPassword = CryptoJS.AES.encrypt(fields.password, process.env.AES_SECRET).toString();
 
                 const supplierData = {
                     representativeName: fields.representativeName,
@@ -45,7 +46,10 @@ export default async function handler(req, res) {
                     panNumber: fields.panNumber,
                     gstNumber: fields.gstNumber,
                     aadharNumber: fields.aadharNumber,
-                    profilePicture,
+                    email:fields.email,
+                    password:encryptedPassword,
+                    role:'supplier'
+
                 };
 
                 try {

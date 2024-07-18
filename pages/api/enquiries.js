@@ -4,36 +4,36 @@ import Item from '@/model/item'; // Adjust the import path as per your project s
 import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
 
 export default async function handler(req, res) {
-    await corsMiddleware(req, res, async () => {
-  const { customerId } = req.query;
-  
-  if (!customerId) {
-    return res.status(400).json({ error: 'Customer ID is required' });
-  }
+  await corsMiddleware(req, res, async () => {
+    const { customerId } = req.query;
 
-  try {
-    await mongoose.connect(process.env.MONGODB_URL_USER, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    if (!customerId) {
+      return res.status(400).json({ error: 'Customer ID is required' });
+    }
 
-    const enquiries = await Enquiry.find({ userId: customerId })
-      .populate({
-        path: 'item',
-        select: 'name', // Select the 'itemName' field from the 'item' collection
-        model: Item // Model reference for 'item' collection
-      })
-      .sort({ createdAt: -1 })
-      .lean();
+    try {
+      await mongoose.connect(process.env.MONGODB_URL_USER, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
 
-    console.log(`Fetched enquiries for customerId ${customerId}:`, enquiries);
+      const enquiries = await Enquiry.find({ userId: customerId })
+        .populate({
+          path: 'item',
+          select: 'name', // Select the 'itemName' field from the 'item' collection
+          model: Item // Model reference for 'item' collection
+        })
+        .sort({ createdAt: -1 })
+        .lean();
 
-    res.status(200).json(enquiries);
-  } catch (error) {
-    console.error('Error fetching enquiries:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    await mongoose.disconnect();
-  }
-})
+      console.log(`Fetched enquiries for customerId ${customerId}:`, enquiries);
+
+      res.status(200).json(enquiries);
+    } catch (error) {
+      console.error('Error fetching enquiries:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } finally {
+      await mongoose.disconnect();
+    }
+  })
 }

@@ -4,7 +4,8 @@ import Header from "@/components/Header";
 import TopCards from "@/components/TopCards";
 import BarChart from "@/components/BarChart";
 import RecentOrders from "@/components/RecentOrders";
-import withAuth from "@/hoc/withAuth"; 
+import withAuth from "@/hoc/withAuth";
+import Footer from "@/components/Footer";
 
 const Home=({ logout, user, componentKey })=> {
   return (
@@ -22,6 +23,7 @@ const Home=({ logout, user, componentKey })=> {
           <BarChart />
           <RecentOrders />
         </div>
+        <Footer />
       </main>
     </>
   );

@@ -18,6 +18,9 @@ const SupplierModal = ({ supplier, onClose }) => {
         <p><strong>PAN Number:</strong> {supplier.panNumber}</p>
         <p><strong>GST Number:</strong> {supplier.gstNumber}</p>
         <p><strong>Aadhar Number:</strong> {supplier.aadharNumber}</p>
+        <p><strong>Email:</strong> {supplier.email}</p>
+        <p><strong>Password:</strong> {supplier.password}</p>
+        <p><strong>Role:</strong> {supplier.role}</p>
         
         <button
           onClick={onClose}

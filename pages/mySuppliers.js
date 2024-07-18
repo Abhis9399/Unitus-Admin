@@ -35,7 +35,7 @@ const Suppliers = ({ initialSuppliers }) => {
       <h1 className="text-2xl font-semibold mb-6">Manage Suppliers</h1>
       <button
         onClick={() => setShowForm(!showForm)}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4 transition duration-300 ease-in-out hover:bg-blue-600"
+        className="bg-blue-900 text-white px-4 py-2 rounded mb-4 transition duration-300 ease-in-out hover:bg-blue-600"
       >
         {showForm ? 'Cancel' : 'Create Supplier'}
       </button>
@@ -115,6 +115,18 @@ const Suppliers = ({ initialSuppliers }) => {
               placeholder="Aadhar Number"
               className="p-2 border rounded w-full"
             />
+            <input
+              type="email"
+              {...register('email')}
+              placeholder="Email"
+              className="p-2 border rounded w-full"
+            />
+            <input
+              type="password"
+              {...register('password')}
+              placeholder="Password"
+              className="p-2 border rounded w-full"
+            />
             {/* <div className="col-span-1 md:col-span-2">
               <label className="block mb-2 font-semibold">Profile Picture</label>
               <input
@@ -127,7 +139,7 @@ const Suppliers = ({ initialSuppliers }) => {
             {/* Include other documents input as needed */}
             <button
               type="submit"
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
+              className="mt-4 bg-blue-900 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
             >
               Add Supplier
             </button>

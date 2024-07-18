@@ -20,6 +20,9 @@ const supplierSchema = new mongoose.Schema({
   panNumber: { type: String, required: true },
   gstNumber: { type: String, required: true },
   aadharNumber: { type: String, required: true },
+  email:{type: String,required :true ,unique:true},
+  password :{type : String,required : true},
+  role:{type:String,default : 'supplier'},
 });
 
 delete mongoose.models.Supplier;
