@@ -20,6 +20,7 @@ const EnquirySchema = new mongoose.Schema({
       brandName: String
     }
   ],
+  materialType: String,
   deadline: Date,
   frequency: String,
   siteAddress: String,
@@ -28,8 +29,21 @@ const EnquirySchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  requirements: [
+    {
+      supplierId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Supplier'
+      },
+      price: Number,
+      message: String,
+      updatedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
 });
 
-const EnquiryModel = mongoose.models && mongoose.models.Enquiry ? mongoose.models.Enquiry : mongoose.model('Enquiry', EnquirySchema);
-export default EnquiryModel;
+module.exports = mongoose.models.Enquiry || mongoose.model('Enquiry', EnquirySchema);

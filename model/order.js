@@ -13,6 +13,15 @@ const orderSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  supplierId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Supplier',
+    required: true
+  },
+  price:{
+    type: Number,
+    required: true
+  },
   item: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Item',

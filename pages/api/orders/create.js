@@ -2,7 +2,20 @@ import mongoose from 'mongoose';
 import Order from '@/model/order';
 import Enquiry from '@/model/enquiryModel';
 import User from '@/model/usersModel';
-import corsMiddleware from '@/utilis/cors'; // Make sure the path is correct
+import corsMiddleware from '@/utilis/cors';
+
+// Connect to MongoDB
+const connectDB = async () => {
+  if (mongoose.connections[0].readyState) {
+    // Use existing database connection
+    return;
+  }
+  // Use new database connection
+  await mongoose.connect(process.env.MONGODB_URL_USER, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+};
 
 export default async function handler(req, res) {
   await corsMiddleware(req, res, async () => {
@@ -17,19 +30,26 @@ export default async function handler(req, res) {
     }
 
     try {
-      await mongoose.connect(process.env.MONGODB_URL_USER, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
+      await connectDB();
 
       const enquiry = await Enquiry.findById(enquiryId);
       if (!enquiry) {
         return res.status(404).json({ success: false, error: 'Enquiry not found' });
       }
 
+      const requirement = enquiry.requirements[0];
+      if (!requirement || !requirement.supplierId || !requirement.price) {
+        return res.status(400).json({ success: false, error: 'Supplier ID or price not found in the enquiry requirements' });
+      }
+
+      const supplierId = requirement.supplierId;
+      const price = requirement.price;
+
       const order = new Order({
         enquiryId: enquiry._id,
         customer: enquiry.userId,
+        supplierId,
+        price,
         item: enquiry.item,
         subProducts: enquiry.subProducts,
         deadline: enquiry.deadline,
@@ -53,8 +73,6 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Error converting enquiry to order:', error);
       res.status(500).json({ success: false, error: 'Internal Server Error' });
-    } finally {
-      await mongoose.disconnect();
     }
   });
 }
