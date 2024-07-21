@@ -15,12 +15,12 @@ const orderSchema = new mongoose.Schema({
   },
   supplierId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Supplier',
+    ref: 'supplier',
     required: true
   },
   price:{
     type: Number,
-    required: true
+    required:true
   },
   item: {
     type: mongoose.Schema.Types.ObjectId,
@@ -49,6 +49,10 @@ const orderSchema = new mongoose.Schema({
   isDealDone: {
     type: Boolean,
     required: true
+  },
+  invoiceGenerated: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,
