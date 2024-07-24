@@ -25,6 +25,7 @@ const EnquirySchema = new mongoose.Schema({
   frequency: String,
   siteAddress: String,
   certificates: String,
+  gstNumber:String,
   paymentTerms: String,
   createdAt: {
     type: Date,
