@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
-import supplier from '@/model/supplier';
+import Supplier from '@/model/supplier';
 import mongoose from 'mongoose';
-import SupplierModal from '@/components/supplier'; // Import your modal
+import SupplierModal from '@/components/supplier';
 
 const Suppliers = ({ initialSuppliers }) => {
   const { register, handleSubmit, reset } = useForm();
   const [showForm, setShowForm] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState(null); // State for selected supplier
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -16,6 +16,9 @@ const Suppliers = ({ initialSuppliers }) => {
     Object.keys(data).forEach((key) => {
       formData.append(key, data[key]);
     });
+
+    // Convert materialType to array
+    formData.set('materialType', data.materialType.split(',').map(item => item.trim()));
 
     try {
       const res = await axios.post('/api/supplier', formData, {
@@ -43,7 +46,7 @@ const Suppliers = ({ initialSuppliers }) => {
       {showForm && (
         <form onSubmit={handleSubmit(onSubmit)} className="mb-6 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
+            <input
               type="text"
               {...register('representativeName')}
               placeholder="Representative Name"
@@ -94,7 +97,7 @@ const Suppliers = ({ initialSuppliers }) => {
             <input
               type="text"
               {...register('materialType')}
-              placeholder="Material Type"
+              placeholder="Material Type (comma separated)"
               className="p-2 border rounded w-full"
             />
             <input
@@ -127,57 +130,32 @@ const Suppliers = ({ initialSuppliers }) => {
               placeholder="Password"
               className="p-2 border rounded w-full"
             />
-            {/* <div className="col-span-1 md:col-span-2">
-              <label className="block mb-2 font-semibold">Profile Picture</label>
-              <input
-                type="file"
-                 {...register('profilePicture', { required: true })}
-                className="p-2 border rounded w-full"
-              />
-            </div> */}
-
-            {/* Include other documents input as needed */}
-            <button
-              type="submit"
-              className="mt-4 bg-blue-900 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
-            >
-              Add Supplier
-            </button>
           </div>
+          <button
+            type="submit"
+            className="mt-4 bg-blue-900 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-blue-600"
+          >
+            Add Supplier
+          </button>
         </form>
       )}
 
       <h2 className="text-xl font-semibold mb-4">All Suppliers</h2>
-      <div className="w-full m-auto p-4 border rounded-lg bg-white overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border">Name</th>
-              <th className="py-2 px-4 border">Contact</th>
-              <th className="py-2 px-4 border">Company Name</th>
-              <th className="py-2 px-4 border">Material Type</th>
-              <th className="py-2 px-4 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {initialSuppliers.map((supplier) => (
-              <tr key={supplier._id}>
-                <td className="border px-4 py-2">{supplier.representativeName}</td>
-                <td className="border px-4 py-2">{supplier.contact}</td>
-                <td className="border px-4 py-2">{supplier.companyName}</td>
-                <td className="border px-4 py-2">{supplier.materialType}</td>
-                <td className="border px-4 py-2">
-                  <button
-                    onClick={() => setSelectedSupplier(supplier)}
-                    className="bg-green-500 text-white px-2 py-1 rounded"
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {initialSuppliers.map((supplier) => (
+          <div key={supplier._id} className="bg-white rounded-lg shadow-md p-4">
+            <h3 className="text-lg font-semibold mb-2">{supplier.representativeName}</h3>
+            <p className="mb-1"><strong>Contact:</strong> {supplier.contact}</p>
+            <p className="mb-1"><strong>Company:</strong> {supplier.companyName}</p>
+            <p className="mb-1"><strong>Materials:</strong> {Array.isArray(supplier.materialType) ? supplier.materialType.join(', ') : supplier.materialType}</p>
+            <button
+              onClick={() => setSelectedSupplier(supplier)}
+              className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+            >
+              View
+            </button>
+          </div>
+        ))}
       </div>
 
       {selectedSupplier && (
@@ -196,7 +174,7 @@ export async function getServerSideProps() {
     useUnifiedTopology: true,
   });
 
-  const suppliers = await supplier.find({}).lean();
+  const suppliers = await Supplier.find({}).lean();
 
   return {
     props: {

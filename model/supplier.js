@@ -9,20 +9,23 @@ const bankDetailsSchema = new mongoose.Schema({
 
 const supplierSchema = new mongoose.Schema({
   representativeName: { type: String, required: true },
-  contact: { type: String, required: true },
+  contact: { type: String, required: true ,unique: true},
   companyName: { type: String, required: true },
   address: { type: String, required: true },
   mapLink: { type: String },
   city: { type: String },
   state: { type: String },
   pincode: { type: String },
-  materialType: { type: String },
+  materialType: { type: [String], required: true },
   panNumber: { type: String, required: true },
   gstNumber: { type: String, required: true },
   aadharNumber: { type: String, required: true },
   email:{type: String,required :true ,unique:true},
   password :{type : String,required : true},
   role:{type:String,default : 'supplier'},
+  dailyPrice: { type: Number, default: 0 },
+  dailyCapacity: { type: Number, default: 0 },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 delete mongoose.models.Supplier;

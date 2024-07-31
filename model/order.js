@@ -36,7 +36,7 @@ const orderSchema = new mongoose.Schema({
       brandName: String
     }
   ],
-  materialType: String,
+  materialType: { type: [String], required: true },
   deadline: Date,
   frequency: String,
   siteAddress: String,
@@ -53,6 +53,10 @@ const orderSchema = new mongoose.Schema({
   invoiceGenerated: {
     type: Boolean,
     default: false
+  },
+  docHashId: {
+    type: String,
+    default: null
   },
   createdAt: {
     type: Date,
