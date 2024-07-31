@@ -49,7 +49,6 @@ export default async function handler(req, res) {
                     email:fields.email,
                     password:encryptedPassword,
                     role:'supplier'
-
                 };
 
                 try {
