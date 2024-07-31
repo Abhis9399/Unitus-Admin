@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Supplier from '../../models/supplierModel';
+import Supplier from '@/model/supplier';
 
 const handler = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
