@@ -1,6 +1,6 @@
 import twilio from 'twilio';
 import mongoose from 'mongoose';
-import Supplier from '../models/supplierModel';
+import Supplier from '@/model/supplier';
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
