@@ -18,23 +18,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    orders: [
-        {
-            enquiryId: {
-                type: mongoose.Schema.Types.ObjectId,
-                required: true
-            },
-            price: {
-                type: Number,
-                required: true
-            },
-            date: {
-                type: Date,
-                default: Date.now,
-                required: true
-            }
-        }
-    ]
 });
 
 // Export the model (use existing model if it exists to prevent OverwriteModelError)

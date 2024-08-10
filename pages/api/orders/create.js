@@ -45,6 +45,12 @@ export default async function handler(req, res) {
       const supplierId = requirement.supplierId;
       const price = requirement.price;
 
+      // Calculate FinalPrice based on subProducts
+      let finalAmount = 0;
+      enquiry.subProducts.forEach(subProduct => {
+        finalAmount += (price * 1.18) * subProduct.quantity;
+      });
+
       const order = new Order({
         enquiryId: enquiry._id,
         customer: enquiry.userId,
@@ -59,6 +65,7 @@ export default async function handler(req, res) {
         paymentTerms: enquiry.paymentTerms,
         totalPrice,
         isDealDone,
+        finalAmount, // Ensure this matches your schema
         createdAt: Date.now(),
       });
 

@@ -1,5 +1,3 @@
-// models/orderModel.js
-
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
@@ -15,12 +13,12 @@ const orderSchema = new mongoose.Schema({
   },
   supplierId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'supplier',
+    ref: 'Supplier',
     required: true
   },
-  price:{
-    type: Number,
-    required:true
+  price: {
+    type: mongoose.Schema.Types.Decimal128,
+    required: true
   },
   item: {
     type: mongoose.Schema.Types.ObjectId,
@@ -30,7 +28,7 @@ const orderSchema = new mongoose.Schema({
   subProducts: [
     {
       name: String,
-      quantity: String,
+      quantity: Number,
       size: String,
       unit: String,
       brandName: String
@@ -43,7 +41,7 @@ const orderSchema = new mongoose.Schema({
   certificates: String,
   paymentTerms: String,
   totalPrice: {
-    type: Number,
+    type: mongoose.Schema.Types.Decimal128,
     required: true
   },
   isDealDone: {
@@ -58,11 +56,17 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  finalAmount: {
+    type: mongoose.Schema.Types.Decimal128,
+    required: true
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
+
 
 const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
 export default Order;

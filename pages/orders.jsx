@@ -23,7 +23,7 @@ const OrdersPage = ({ initialOrders }) => {
             <div className="p-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800">Order ID: {order._id}</h3>
               <p className="text-gray-600">Customer ID: {order.customer}</p>
-              <p className="text-gray-600">Total Price: ₹{order.totalPrice}</p>
+              <p className="text-gray-600">Total Amount: ₹{order.finalAmount}</p>
             </div>
             {expandedOrderId === order._id && (
               <div className="p-4 bg-gray-50">

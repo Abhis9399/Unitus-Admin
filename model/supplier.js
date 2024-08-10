@@ -23,7 +23,9 @@ const supplierSchema = new mongoose.Schema({
   email:{type: String,required :true ,unique:true},
   password :{type : String,required : true},
   role:{type:String,default : 'supplier'},
-  dailyPrice: { type: Number, default: 0 },
+  dailyPrice: {  
+    type: mongoose.Schema.Types.Decimal128, 
+    default: 0 },
   dailyCapacity: { type: Number, default: 0 },
   updatedAt: { type: Date, default: Date.now }
 });

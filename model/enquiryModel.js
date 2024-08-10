@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
 
+
+// Define SchemaTypes after registering the plugin
+const SchemaTypes = mongoose.Schema.Types;
+
 const EnquirySchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,7 +41,7 @@ const EnquirySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Supplier'
       },
-      price: Number,
+      price: mongoose.Schema.Types.Decimal128,
       message: String,
       updatedAt: {
         type: Date,

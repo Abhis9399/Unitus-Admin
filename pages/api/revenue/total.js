@@ -10,7 +10,7 @@ export default async function handler(req, res) {
   try {
     await connectDb();
     const totalRevenue = await Order.aggregate([
-      { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+      { $group: { _id: null, total: { $sum: "$finalAmount" } } }
     ]);
 
     res.status(200).json({ totalRevenue: totalRevenue[0].total });

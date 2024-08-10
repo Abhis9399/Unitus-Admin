@@ -65,6 +65,7 @@ const Sidebar = ({ children }) => {
               <span className="ml-2 font-medium">Suppliers</span>
             </div>
           </Link>
+       
 
           <Link href="/orders">
             <div className="bg-gray-200 text-gray-900 hover:bg-blue-900 cursor-pointer my-4 p-3 pr-32 rounded-lg flex items-center transition-all w-full">

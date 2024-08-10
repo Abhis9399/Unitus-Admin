@@ -48,6 +48,7 @@ const CustomerEnquiries = ({ customerId }) => {
         enquiryId,
         totalPrice,
         isDealDone,
+        
       });
   
       console.log('Order creation response:', response.data);
@@ -123,7 +124,7 @@ const CustomerEnquiries = ({ customerId }) => {
             <div className="mb-4">
               <label htmlFor="totalPrice" className="block text-sm font-medium text-gray-700">Total Price</label>
               <input
-                type="number"
+                type="double"
                 id="totalPrice"
                 value={totalPrice}
                 onChange={(e) => setTotalPrice(e.target.value)}

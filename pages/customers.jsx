@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { BsPersonFill } from "react-icons/bs";
 import mongoose from "mongoose";
 import users from '@/model/usersModel';
-import Order from '@/model/order'; // Import the order model
+// import Order from '@/model/order'; // Import the order model
 
 const CustomersPage = ({ initialCustomers }) => {
   const [customers, setCustomers] = useState(initialCustomers || []);
@@ -15,18 +15,18 @@ const CustomersPage = ({ initialCustomers }) => {
     router.push("/Check-Enquiry");
   };
 
-  const toggleOrders = async (customerId) => {
-    if (selectedCustomer === customerId) {
-      setSelectedCustomer(null);
-      setOrders([]);
-    } else {
-      setSelectedCustomer(customerId);
-      // Fetch orders for the selected customer
-      const response = await fetch(`/api/orders/index?customerId=${customerId}`);
-      const data = await response.json();
-      setOrders(data.orders);
-    }
-  };
+  // const toggleOrders = async (customerId) => {
+  //   if (selectedCustomer === customerId) {
+  //     setSelectedCustomer(null);
+  //     setOrders([]);
+  //   } else {
+  //     setSelectedCustomer(customerId);
+  //     // Fetch orders for the selected customer
+  //     const response = await fetch(`/api/orders/index?customerId=${customerId}`);
+  //     const data = await response.json();
+  //     setOrders(data.orders);
+  //   }
+  // };
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -62,7 +62,7 @@ const CustomersPage = ({ initialCustomers }) => {
                 <p className="text-gray-600 sm:text-left text-right">{customer.email}</p>
                 <p className="hidden sm:flex">{customer.phone}</p>
        
-                {selectedCustomer === customer._id && (
+                {/* {selectedCustomer === customer._id && (
                   <div className="col-span-4 bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold mb-2">Orders</h3>
                     {orders.length > 0 ? (
@@ -80,7 +80,7 @@ const CustomersPage = ({ initialCustomers }) => {
                       <p>No orders found for this customer.</p>
                     )}
                   </div>
-                )}
+                )} */}
               </li>
             ))}
           </ul>
