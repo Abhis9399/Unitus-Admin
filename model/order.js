@@ -60,6 +60,12 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Decimal128,
     required: true
   },
+
+  shipdayInserted: {
+        type: Boolean,
+        default: false
+    },
+
   createdAt: {
     type: Date,
     default: Date.now
