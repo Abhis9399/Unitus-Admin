@@ -2,7 +2,7 @@ import shipday from "shipday/integration";
 import OrderInfoRequest from "shipday/integration/order/request/order.info.request";
 import OrderItem from "shipday/integration/order/request/order.item";
 import Order from '@/model/order';  // Adjust the path as needed
-
+import item from "@/model/item";
 const shipdayClient = new shipday(process.env.NEXT_PUBLIC_SHIPDAY, 55800);
 export default async function handler(req, res) {
     const { orderId } = req.query;

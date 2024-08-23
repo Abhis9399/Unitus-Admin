@@ -21,6 +21,7 @@ const SupplierModal = ({ supplier, onClose }) => {
         <p><strong>Email:</strong> {supplier.email}</p>
         {/* <p><strong>Password:</strong> {supplier.password}</p> */}
         <p><strong>Role:</strong> {supplier.role}</p>
+        <p><strong>Assigned Member:</strong> {supplier.assignedMember.name}</p>
         <button
           onClick={onClose}
           className="mt-4 bg-red-500 text-white px-4 py-2 rounded transition duration-300 ease-in-out hover:bg-red-600"

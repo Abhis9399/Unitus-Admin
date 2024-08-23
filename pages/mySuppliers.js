@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import Supplier from '@/model/supplier';
@@ -8,7 +8,20 @@ import SupplierModal from '@/components/supplier';
 const Suppliers = ({ initialSuppliers }) => {
   const { register, handleSubmit, reset } = useForm();
   const [showForm, setShowForm] = useState(false);
+  const [members, setMembers] = useState([]);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  useEffect(() => {
+    async function fetchMembers() {
+      try {
+        const res = await axios.get('/api/member');
+        setMembers(res.data.data);
+      } catch (error) {
+        console.error('Error fetching members:', error);
+      }
+    }
+    fetchMembers();
+  }, []);
 
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -130,6 +143,19 @@ const Suppliers = ({ initialSuppliers }) => {
               placeholder="Password"
               className="p-2 border rounded w-full"
             />
+
+            {/* Dropdown for selecting a member */}
+            <select
+              {...register('assignedMember')}
+              className="p-2 border rounded w-full"
+            >
+              <option value="">Select a Member</option>
+              {members.map((member) => (
+                <option key={member._id} value={member._id}>
+                  {member.name}
+                </option>
+              ))}
+            </select>
           </div>
           <button
             type="submit"
@@ -148,6 +174,7 @@ const Suppliers = ({ initialSuppliers }) => {
             <p className="mb-1"><strong>Contact:</strong> {supplier.contact}</p>
             <p className="mb-1"><strong>Company:</strong> {supplier.companyName}</p>
             <p className="mb-1"><strong>Materials:</strong> {Array.isArray(supplier.materialType) ? supplier.materialType.join(', ') : supplier.materialType}</p>
+            
             <button
               onClick={() => setSelectedSupplier(supplier)}
               className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
@@ -174,7 +201,7 @@ export async function getServerSideProps() {
     useUnifiedTopology: true,
   });
 
-  const suppliers = await Supplier.find({}).lean();
+  const suppliers = await Supplier.find({}).populate('assignedMember').exec();
 
   return {
     props: {

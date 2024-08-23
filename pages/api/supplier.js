@@ -6,6 +6,7 @@ import fs from 'fs';
 import corsMiddleware from '@/utilis/cors'
 import jwt, { decode } from 'jsonwebtoken'
 import CryptoJS from "crypto-js";
+import Member from '@/model/Member'
 
 // Disable Next.js's default body parsing to handle multipart/form-data
 export const config = {
@@ -29,8 +30,6 @@ export default async function handler(req, res) {
 
                 console.log('Parsed Fields:', fields); // Log fields to check structure
 
-                const profilePicture = files.profilePicture ? files.profilePicture.filepath : '';
-
                 const encryptedPassword = CryptoJS.AES.encrypt(fields.password, process.env.AES_SECRET).toString();
 
                 const supplierData = {
@@ -48,12 +47,22 @@ export default async function handler(req, res) {
                     aadharNumber: fields.aadharNumber,
                     email:fields.email,
                     password:encryptedPassword,
-                    role:'supplier'
+                    role:'supplier',
+                    assignedMember: fields.assignedMember || null, 
                 };
 
                 try {
                     const supplier = new Supplier(supplierData);
                     await supplier.save();
+
+                     // Update the member's assignedClients
+                const member = await Member.findById(fields.assignedMember);
+                if (member) {
+                    member.assignedClients.push(supplier._id);
+                    await member.save();
+                }
+
+
                     return res.status(200).json({ message: 'Supplier created successfully', supplier });
                 } catch (error) {
                     console.error('Error creating supplier:', error);

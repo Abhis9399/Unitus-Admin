@@ -27,6 +27,7 @@ const supplierSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Decimal128, 
     default: 0 },
   dailyCapacity: { type: Number, default: 0 },
+  assignedMember: { type: mongoose.Schema.Types.ObjectId, ref: 'Member' }, // New field
   updatedAt: { type: Date, default: Date.now }
 });
 

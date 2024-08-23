@@ -5,6 +5,7 @@ import { FiSettings } from "react-icons/fi";
 import { HiOutlineShoppingBag } from "react-icons/hi";
 import { MdLocalGroceryStore } from "react-icons/md";
 import { FiMenu, FiX } from "react-icons/fi";
+import { RiTeamFill } from "react-icons/ri";
 
 const Sidebar = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -71,6 +72,14 @@ const Sidebar = ({ children }) => {
             <div className="bg-gray-200 text-gray-900 hover:bg-blue-900 cursor-pointer my-4 p-3 pr-32 rounded-lg flex items-center transition-all w-full">
               <MdLocalGroceryStore size={20} />
               <span className="ml-2 font-medium">Orders</span>
+            </div>
+          </Link>
+
+          <Link href="/members">
+            <div className="bg-gray-200 text-gray-900 hover:bg-blue-900 cursor-pointer my-4 p-3 pr-28
+             rounded-lg flex items-center transition-all w-full">
+              <RiTeamFill size={20} />
+              <span className="ml-2 font-medium">Members</span>
             </div>
           </Link>
       
