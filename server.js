@@ -16,7 +16,7 @@ app.prepare().then(() => {
 
   // Middleware
   server.use(cors({
-    origin: 'https://unitus-admin-1cjcvqq51-abhishek-dahiwals-projects.vercel.app', // Replace with your Vercel deployment URL
+    origin: 'https://unitus-admin-7kemm53ya-abhishek-dahiwals-projects.vercel.app', // Replace with your Vercel deployment URL
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   }));
   server.use(express.json());
