@@ -82,6 +82,13 @@ const Sidebar = ({ children }) => {
               <span className="ml-2 font-medium">Members</span>
             </div>
           </Link>
+          <Link href="/prices">
+            <div className="bg-gray-200 text-gray-900 hover:bg-blue-900 cursor-pointer my-4 p-3 pr-36
+             rounded-lg flex items-center transition-all w-full">
+              <HiOutlineShoppingBag size={20} />
+              <span className="ml-2 font-medium">Prices</span>
+            </div>
+          </Link>
       
         </div>
       </div>

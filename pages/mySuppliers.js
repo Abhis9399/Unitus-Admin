@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import Supplier from '@/model/supplier';
 import mongoose from 'mongoose';
 import SupplierModal from '@/components/supplier';
+import Member from '@/model/Member'
 
 const Suppliers = ({ initialSuppliers }) => {
   const { register, handleSubmit, reset } = useForm();

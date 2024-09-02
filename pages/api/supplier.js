@@ -1,12 +1,12 @@
 // pages/api/supplier.js
-import dbConnect from '@/mongoose/mongodbUser'; // Your db connection logic
+import { connectToDatabase } from '@/mongoose/mongodbUser'; // Your db connection logic
 import Supplier from '@/model/supplier'; // Import the Supplier model
-const formidable= require('formidable'); // For handling file uploads
+const formidable = require('formidable'); // For handling file uploads
 import fs from 'fs';
-import corsMiddleware from '@/utilis/cors'
-import jwt, { decode } from 'jsonwebtoken'
+import corsMiddleware from '@/utilis/cors';
+import jwt from 'jsonwebtoken';
 import CryptoJS from "crypto-js";
-import Member from '@/model/Member'
+import Member from '@/model/Member';
 
 // Disable Next.js's default body parsing to handle multipart/form-data
 export const config = {
@@ -17,10 +17,10 @@ export const config = {
 
 export default async function handler(req, res) {
     corsMiddleware(req, res, async () => {
-        await dbConnect();
+        await connectToDatabase();
 
         if (req.method === 'POST') {
-            await dbConnect();
+            await connectToDatabase();
             const form = new formidable.IncomingForm({ multiples: true });
 
             form.parse(req, async (err, fields, files) => {
@@ -31,6 +31,12 @@ export default async function handler(req, res) {
                 console.log('Parsed Fields:', fields); // Log fields to check structure
 
                 const encryptedPassword = CryptoJS.AES.encrypt(fields.password, process.env.AES_SECRET).toString();
+                
+                // Fetch the assigned member's name
+                const assignedMember = await Member.findById(fields.assignedMember).select('name');
+                if (!assignedMember) {
+                    return res.status(400).json({ error: 'Assigned member not found' });
+                }
 
                 const supplierData = {
                     representativeName: fields.representativeName,
@@ -41,27 +47,23 @@ export default async function handler(req, res) {
                     city: fields.city,
                     state: fields.state,
                     pincode: fields.pincode,
-                    materialType : fields.materialType,
+                    materialType: fields.materialType,
                     panNumber: fields.panNumber,
                     gstNumber: fields.gstNumber,
                     aadharNumber: fields.aadharNumber,
-                    email:fields.email,
-                    password:encryptedPassword,
-                    role:'supplier',
-                    assignedMember: fields.assignedMember || null, 
+                    email: fields.email,
+                    password: encryptedPassword,
+                    role: 'supplier',
+                    assignedMember: { name: assignedMember.name }, // Corrected assignment
                 };
 
                 try {
                     const supplier = new Supplier(supplierData);
                     await supplier.save();
 
-                     // Update the member's assignedClients
-                const member = await Member.findById(fields.assignedMember);
-                if (member) {
-                    member.assignedClients.push(supplier._id);
-                    await member.save();
-                }
-
+                    // Update the member's assignedClients
+                    assignedMember.assignedClients.push(supplier._id);
+                    await assignedMember.save();
 
                     return res.status(200).json({ message: 'Supplier created successfully', supplier });
                 } catch (error) {
@@ -74,19 +76,15 @@ export default async function handler(req, res) {
             // Fetching the supplier information
             if (!req.headers.authorization) {
                 return res.status(401).json({ success: false, error: 'Unauthorized - Missing token' });
-              }
-        
-              const token = req.headers.authorization?.replace('Bearer ', '');
-              console.log(token);
-              const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-              if (!decodedToken.id) {
+            }
+
+            const token = req.headers.authorization?.replace('Bearer ', '');
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+            if (!decodedToken.id) {
                 return res.status(401).json({ success: false, error: 'Unauthorized' });
-              }
-        
-              console.log(decodedToken)
-        
-              const supplierId = decodedToken.id;
-              console.log(supplierId)
+            }
+
+            const supplierId = decodedToken.id;
 
             try {
                 const supplier = await Supplier.findById(supplierId);
@@ -98,10 +96,8 @@ export default async function handler(req, res) {
                 console.error('Error fetching supplier:', error);
                 return res.status(500).json({ error: 'Error fetching supplier', details: error.message });
             }
-        }
-
-        else {
+        } else {
             return res.status(405).json({ error: 'Method not allowed' });
         }
-    })
+    });
 }

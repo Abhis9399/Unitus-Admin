@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const NotificationSchema = new mongoose.Schema({
-  minPrice: {  type: SchemaTypes.Double, },
-  maxCapacity: { type: Number },
-  timestamp: { type: Date, default: Date.now }
+    supplierId: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier', required: true },
+    date: { type: Date, default: Date.now },
+    materialRate: { type: String, required: true },
+    vehicleAvailability: { type: String, required: true }
 });
 
-export default mongoose.models.Notification || mongoose.model('Notification', NotificationSchema);
+module.exports = mongoose.model('Notification', NotificationSchema);

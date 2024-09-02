@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import Order from '@/model/order';
-import User from '@/model/usersModel';  // Adjust the path as necessary
-import { OrderInfoRequest, OrderItem, PaymentMethod, CardType } from 'shipday/integration';
 import mongoose from 'mongoose';
+import Order from '@/model/order';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,8 +22,8 @@ const OrdersPage = ({ initialOrders }) => {
         throw new Error('Failed to fetch tracking data');
       }
       const data = await response.json();
-      console.log('Tracking Data:', data); // Log tracking data for debugging
-      setTrackingData((prev) => ({ ...prev, [orderId]: data })); // Update tracking data for the specific order
+      console.log('Tracking Data:', data);
+      setTrackingData((prev) => ({ ...prev, [orderId]: data }));
     } catch (error) {
       console.error('Error fetching tracking data:', error.message);
     } finally {
@@ -47,13 +45,10 @@ const OrdersPage = ({ initialOrders }) => {
         throw new Error('Failed to insert order into Shipday');
       }
       const data = await response.json();
-      console.log('Order inserted into Shipday:', data); // Log response for debugging
-      
-      // Show success toast
+      console.log('Order inserted into Shipday:', data);
       toast.success('Order successfully inserted into Shipday!');
     } catch (error) {
       console.error('Error inserting order into Shipday:', error.message);
-      // Show error toast
       toast.error('Failed to insert order into Shipday.');
     } finally {
       setLoading(false);
@@ -127,6 +122,13 @@ const OrdersPage = ({ initialOrders }) => {
   );
 };
 
+const formatValue = (value) => {
+  if (value instanceof mongoose.Types.Decimal128) {
+    return parseFloat(value.toString()).toFixed(2); // Format to two decimal places
+  }
+  return value; // Return the value as is if not Decimal128
+};
+
 export async function getServerSideProps() {
   await mongoose.connect(process.env.MONGODB_URL_USER, {
     useNewUrlParser: true,
@@ -135,9 +137,18 @@ export async function getServerSideProps() {
 
   const orders = await Order.find({}).lean();
 
+  const formattedOrders = orders.map(order => ({
+    ...order,
+    finalAmount: formatValue(order.finalAmount),
+    subProducts: order.subProducts.map(sp => ({
+      ...sp,
+      price: formatValue(sp.price),
+    })),
+  }));
+
   return {
     props: {
-      initialOrders: JSON.parse(JSON.stringify(orders)),
+      initialOrders: JSON.parse(JSON.stringify(formattedOrders)),
     },
   };
 }

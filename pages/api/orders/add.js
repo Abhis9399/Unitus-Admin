@@ -1,11 +1,11 @@
-import dbConnect from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import Order from '@/model/order';
 import Customer from '@/model/customer';
 import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-  await dbConnect();
+  await connectToDatabase();
   if (req.method === 'POST') {
     try {
       const { customerId, totalPrice, items } = req.body;

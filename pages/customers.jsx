@@ -1,36 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { BsPersonFill } from "react-icons/bs";
+import { connectToDatabase } from "@/mongoose/mongodbUser"; // Assuming you have a db connection utility
+import Customer from "@/model/usersModel"; // Import your Customer model
+import Order from "@/model/order"; // Import your Order model
 import mongoose from "mongoose";
-import users from '@/model/usersModel';
-// import Order from '@/model/order'; // Import the order model
 
 const CustomersPage = ({ initialCustomers }) => {
   const [customers, setCustomers] = useState(initialCustomers || []);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [orders, setOrders] = useState([]);
+  const [orderDetails, setOrderDetails] = useState([]);
   const router = useRouter();
 
   const navigateToAddCustomer = () => {
     router.push("/Check-Enquiry");
   };
 
-  // const toggleOrders = async (customerId) => {
-  //   if (selectedCustomer === customerId) {
-  //     setSelectedCustomer(null);
-  //     setOrders([]);
-  //   } else {
-  //     setSelectedCustomer(customerId);
-  //     // Fetch orders for the selected customer
-  //     const response = await fetch(`/api/orders/index?customerId=${customerId}`);
-  //     const data = await response.json();
-  //     setOrders(data.orders);
-  //   }
-  // };
+  const fetchOrders = async (customerId) => {
+    const response = await fetch(`/api/FetchOrders/${customerId}`);
+    const data = await response.json();
+    setOrderDetails(data.orders);
+    setSelectedCustomer(customerId);
+  };
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      <div className="flex justify-between p-4">
+    <div className="bg-gray-100 min-h-screen p-4">
+      <div className="flex justify-between mb-4">
         <h2 className="text-2xl font-bold">Customers</h2>
         <button
           onClick={navigateToAddCustomer}
@@ -39,71 +34,84 @@ const CustomersPage = ({ initialCustomers }) => {
           Check Enquiry
         </button>
       </div>
-      <div className="p-4">
-        <div className="w-full m-auto p-4 border rounded-lg bg-white overflow-y-auto">
-          <div className="my-3 p-2 grid md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer">
-            <span>Name</span>
-            <span className="sm:text-left text-right">Email</span>
-            <span className="hidden sm:grid">Phone</span>
+      <div className="w-full m-auto grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {customers.map((customer) => (
+          <div
+            key={customer._id}
+            className="bg-white p-4 rounded-lg shadow-lg flex flex-col"
+          >
+            <div className="flex items-center mb-2">
+              <BsPersonFill className="text-blue-900 mr-2 text-3xl" />
+              <h3 className="text-lg font-semibold">{customer.name}</h3>
+            </div>
+            <p className="mb-1"><strong>Email:</strong> {customer.email}</p>
+            <p className="mb-1"><strong>Phone:</strong> {customer.phone}</p>
+            <p className="mb-1"><strong>Revenue:</strong> ₹{parseFloat(customer.revenue).toFixed(2)}</p>
+            <button
+              // onClick={() => fetchOrders(customer._id)}
+              className="bg-blue-600 text-white p-2 rounded mt-auto"
+            >
+              View All Orders
+            </button>
           </div>
-          <ul>
-            {customers.map((customer) => (
-              <li
-                key={customer._id}
-                className="bg-gray-50 hover:bg-gray-100 rounded-lg my-3 p-2 grid 
-                            md:grid-cols-4 sm:grid-cols-3 grid-cols-2 items-center justify-between cursor-pointer"
-              >
-                <div onClick={() => toggleOrders(customer._id)} className="flex items-center">
-                  <div className="bg-purple-100 p-3 rounded-lg">
-                    <BsPersonFill className="text-blue-900" />
-                  </div>
-                  <p className="pl-4">{customer.name}</p>
-                </div>
-                <p className="text-gray-600 sm:text-left text-right">{customer.email}</p>
-                <p className="hidden sm:flex">{customer.phone}</p>
-       
-                {/* {selectedCustomer === customer._id && (
-                  <div className="col-span-4 bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold mb-2">Orders</h3>
-                    {orders.length > 0 ? (
-                      <ul>
-                        {orders.map((order) => (
-                          <li key={order._id} className="mb-2">
-                            <p><strong>Order Id:</strong> {order._id}</p>
-                            <p><strong>Customer Id:</strong> {order.customer}</p>
-                            <p><strong>Price:</strong> {order.totalPrice}</p>
-                            <p><strong>Status:</strong> {order.isDealDone}</p>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>No orders found for this customer.</p>
-                    )}
-                  </div>
-                )} */}
-              </li>
-            ))}
-          </ul>
-        </div>
+        ))}
       </div>
+      {selectedCustomer && (
+        <div className="p-4 mt-4 bg-white border rounded-lg">
+          <h3 className="text-lg font-semibold mb-2">Orders for {selectedCustomer}</h3>
+          {orderDetails.length > 0 ? (
+            <ul>
+              {orderDetails.map((order) => (
+                <li key={order._id} className="mb-2">
+                  <p><strong>Order Id:</strong> {order._id}</p>
+                  <p><strong>Item Id:</strong> {order.item}</p>
+                  <p><strong>Final Amount:</strong> ₹{parseFloat(order.finalAmount).toFixed(2)}</p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No orders found for this customer.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-// Server-side rendering or static generation to provide initial data
+// Server-side rendering to fetch initial customer data
 export async function getServerSideProps() {
   await mongoose.connect(process.env.MONGODB_URL_USER, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
 
-  const customers = await users.find({}).lean();
-  
+  const customers = await Customer.find({}).lean();
+
+  for (let customer of customers) {
+    const orders = await Order.find({ customer: customer._id }).lean();
+
+    let totalRevenue = 0; // Start with a number 0
+
+    for (let order of orders) {
+      if (order.finalAmount) {
+        // Convert Decimal128 to string and then parse it as a number for addition
+        const orderAmount = parseFloat(order.finalAmount.toString());
+        totalRevenue += orderAmount;
+      }
+      else {
+        console.log(`Order ID: ${order._id} has no finalAmount field.`);
+      }
+    }
+
+    customer.revenue = totalRevenue.toFixed(2);
+  }
+
   return {
     props: {
       initialCustomers: JSON.parse(JSON.stringify(customers)),
     },
   };
 }
+
 
 export default CustomersPage;

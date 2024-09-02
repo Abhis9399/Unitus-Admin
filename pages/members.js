@@ -91,29 +91,50 @@ const MembersPage = () => {
         className="border p-2 mb-4 w-full"
       />
 
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Existing Members</h2>
-        <ul className="list-disc pl-5">
-          {filteredMembers.map((member) => (
-            <li key={member._id} className="mb-4">
-              <div className="font-bold">{member.name}</div>
-              <div>Phone: {member.phone}</div>
-              <div>Assigned Suppliers:</div>
-              <ul className="list-disc pl-5">
-                {member.suppliers && member.suppliers.map(supplier => (
-                  <li key={supplier._id}>{supplier.representativeName} - {supplier.companyName}</li>
-                ))}
-              </ul>
-              <div>Assigned Users:</div>
-              <ul className="list-disc pl-5">
-                {member.users && member.users.map(user => (
-                  <li key={user._id}>{user.name} - {user.email}</li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
+<div className="bg-white shadow rounded-lg p-6">
+  <h2 className="text-2xl font-semibold mb-4 text-gray-800">Existing Members</h2>
+  <ul className="divide-y divide-gray-200">
+    {filteredMembers.map((member) => (
+      <li key={member._id} className="py-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <div className="text-lg font-bold text-blue-600">{member.name}</div>
+            <div className="text-sm text-gray-500">Phone: {member.phone}</div>
+          </div>
+          <div className="flex space-x-4">
+            <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+              Suppliers: {member.suppliers?.length || 0}
+            </div>
+            <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">
+              Users: {member.users?.length || 0}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="font-semibold text-gray-700">Assigned Suppliers:</div>
+          <ul className="list-disc pl-5 text-gray-600">
+            {member.suppliers && member.suppliers.map(supplier => (
+              <li key={supplier._id} className="text-sm">
+                {supplier.representativeName} - {supplier.companyName}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="mt-4">
+          <div className="font-semibold text-gray-700">Assigned Users:</div>
+          <ul className="list-disc pl-5 text-gray-600">
+            {member.users && member.users.map(user => (
+              <li key={user._id} className="text-sm">
+                {user.name} - {user.email}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    ))}
+  </ul>
+</div>
+
     </div>
   );
 };

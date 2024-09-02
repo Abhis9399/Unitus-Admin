@@ -1,5 +1,5 @@
 import User from "@/model/Admin";
-import connectDb from "@/mongoose/mongodbUser";
+import {connectToDatabase} from "@/mongoose/mongodbUser";
 import jwt from 'jsonwebtoken';
 import CryptoJS from "crypto-js";
 import { setCookie } from 'nookies';
@@ -8,7 +8,7 @@ import corsMiddleware from '@/utilis/cors';// Make sure the path is correct
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
         if (req.method === 'POST') {
-            await connectDb();
+            await connectToDatabase();
 
             try {
                 const { email, password } = req.body;

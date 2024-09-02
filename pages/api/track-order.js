@@ -2,7 +2,7 @@ import Shipday from 'shipday/integration';
 import corsMiddleware from '@/utilis/cors';
 import { OrderInfoRequest, OrderItem, PaymentMethod, CardType } from 'shipday/integration';
 
-import dbConnect from '@/mongoose/mongodbUser'; // Your db connection logic
+import {connectToDatabase} from '@/mongoose/mongodbUser'; // Your db connection logic
 import Order from '@/model/order';
 
 // Initialize the Shipday client with your API key
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
       try {
         // Connect to your MongoDB database
-        await dbConnect();
+        await connectToDatabase();
 
         // Fetch the order from the database to get the Shipday hash ID
         const order = await Order.findById(orderId);

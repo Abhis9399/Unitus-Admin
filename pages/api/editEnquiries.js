@@ -1,4 +1,4 @@
-import dbConnect from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import Enquiry from '@/model/enquiryModel'; // Adjust the import based on your model structure
 import corsMiddleware from '@/utilis/cors'; // Make sure the path is correct
 
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     console.log(`Received ${method} request for enquiry ID: ${req.query.enquiryId}`);
 
     try {
-      await dbConnect();
+      await connectToDatabase();
       console.log('Database connected successfully');
 
       if (method === 'PUT') {

@@ -1,8 +1,6 @@
-import twilio from 'twilio';
 import mongoose from 'mongoose';
 import Supplier from '@/model/supplier';  // Assuming you have a supplier model
-
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+import Message from '@/model/message';  // Assuming you have a message model
 
 const handler = async (req, res) => {
   if (req.method !== 'POST') {
@@ -16,22 +14,32 @@ const handler = async (req, res) => {
     });
 
     const suppliers = await Supplier.find({});
-    const message = "Good morning! Please enter today's price, vehicle availability, and material supply in the format: Price:XX, Capacity:YY, Material:ZZ. Reply to this message.";
 
-    await Promise.all(suppliers.map(supplier => 
-      client.messages.create({
-        from: `whatsapp:${process.env.TWILIO_FROM_NUMBER}`,
-        to: `whatsapp:${supplier.contact}`,
-        body: message
-      })
-    ));
+    // Iterate over each supplier
+    await Promise.all(suppliers.map(async (supplier) => {
+      // Delete previous messages for the supplier
+      await Message.deleteMany({ supplierId: supplier._id });
 
-    res.status(200).json({ message: 'Notifications sent successfully!' });
+      const currentDate = new Date().toLocaleDateString();  // Formats the date as mm/dd/yyyy
+      const messageContent = `Good morning! ${supplier.representativeName}, please enter today's (${currentDate}) price, vehicle availability, and material supply in the format: Price:XX, Capacity:YY, Material:ZZ.`;
+      
+      // Create and save the new message
+      const message = new Message({
+        supplierId: supplier._id,
+        content: messageContent,
+        timestamp: new Date(),
+        status: 'unread'  // Assuming you have a status field to mark messages as unread
+      });
+
+      await message.save();
+    }));
+
+    res.status(200).json({ message: 'Messages saved to dashboards successfully!' });
   } catch (error) {
-    console.error('Error sending notifications:', error);
-    res.status(500).json({ error: 'Error sending notifications' });
+    console.error('Error saving messages:', error);
+    res.status(500).json({ error: 'Error saving messages' });
   } finally {
-    mongoose.connection.close();
+    await mongoose.disconnect();
   }
 };
 

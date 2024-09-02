@@ -1,4 +1,4 @@
-import dbConnect from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import Supplier from '@/model/supplier';
 import corsMiddleware from '@/utilis/cors'; // Make sure the path is correct
 import mongoose from 'mongoose';

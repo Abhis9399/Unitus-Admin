@@ -1,4 +1,4 @@
-import dbConnect from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import Customer from '@/model/usersModel';
 import corsMiddleware from '@/utilis/cors'; // Make sure the path is correct
 
@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
   
   try {
-    await dbConnect();
+    await connectToDatabase();
     const totalCustomers = await Customer.countDocuments();
     res.status(200).json({ totalCustomers });
   } catch (error) {

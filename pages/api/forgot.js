@@ -1,4 +1,4 @@
-import dbConnect from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import Forgot from '@/model/forgot';
 import User from '@/model/Admin';
 import nodemailer from 'nodemailer';
@@ -8,7 +8,7 @@ import corsMiddleware from '@/utilis/cors'// Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-    await dbConnect();
+    await connectToDatabase();
     console.log('Received request to /api/forgot:', req.body);
 
     const { email, sendMail, newPassword, token } = req.body;

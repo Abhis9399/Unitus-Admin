@@ -2,9 +2,8 @@
 import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import Order from '@/model/order';
-import connectToDatabase from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 export default async function handler(req,res){
-  await connectToDatabase();
  
   try {
     if (req.method === 'GET') {

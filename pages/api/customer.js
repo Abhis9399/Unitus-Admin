@@ -1,11 +1,11 @@
 // pages/api/customers.js
-import connectMongo from '@/mongoose/mongodbUser';
+import {connectToDatabase} from '@/mongoose/mongodbUser';
 import customers from '@/model/usersModel';
 import corsMiddleware from '@/utilis/cors' // Make sure the path is correct
 
 export default async function handler(req, res) {
     await corsMiddleware(req, res, async () => {
-  await connectMongo();
+  await connectToDatabase();
     try {
       const Customers = await customers.find({});
       console.log('Fetched customers:', Customers); // Add this line
