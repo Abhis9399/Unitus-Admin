@@ -9,19 +9,27 @@ const Login = () => {
 
 
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      router.push('/')
+    if (typeof window !== 'undefined') { // Ensure the code runs only on the client side
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        if (token && role) {
+            if (role === 'admin') {
+                router.push('/admin/dashboard');
+            } else if (role === 'supplierExecutive') {
+                router.push('/mySuppliers');
+            }
+        }
     }
-  }, [])
+}, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'email') {
-      setEmail(value);
+    if (name === 'phone') {
+      setPhone(value);
     } else if (name === 'password') {
       setPassword(value);
     }
@@ -29,9 +37,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const data = { email, password };
-
+  
+    const data = { phone, password };
+  
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -40,15 +48,18 @@ const Login = () => {
         },
         body: JSON.stringify(data),
       });
-
+  
       if (!res.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const response = await res.json();
-
+  
       if (response.success) {
         localStorage.setItem('token', response.token);
+  
+        localStorage.setItem('role', response.role); // Save user role
+  
         toast.success('You are Successfully logged in!', {
           position: 'bottom-center',
           autoClose: 3000,
@@ -60,16 +71,21 @@ const Login = () => {
           theme: 'colored',
           transition: Bounce,
         });
-
+  
+        // Redirect based on the role
         setTimeout(() => {
-          router.push('/');
+          if (response.role === 'admin') {
+            router.push('/admin/dashboard');
+          } else if (response.role === 'supplierExecutive') {
+            router.push('/mysuppliers');
+          } else {
+            router.push('/admin/dashboard'); // Default to home or another page
+          }
         }, 1000);
-
-        setEmail('');
+  
+        setPhone('');
         setPassword('');
-
-      }
-      else {
+      } else {
         toast.error('Invalid Credentials', {
           position: 'bottom-center',
           autoClose: 3000,
@@ -97,6 +113,7 @@ const Login = () => {
       });
     }
   };
+  
 
   return (
     <div className="min-w-screen min-h-screen bg-gray-900 flex items-center justify-center px-5 py-5">
@@ -114,10 +131,10 @@ const Login = () => {
 
               <div className="flex -mx-3">
                 <div className="w-full px-3 mb-5">
-                  <label htmlFor='email' className="text-xs font-semibold px-1">Email</label>
+                  <label htmlFor='phone' className="text-xs font-semibold px-1">Phone</label>
                   <div className="flex">
                     <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center"><i className="mdi mdi-email-outline text-gray-400 text-lg"></i></div>
-                    <input type="email" onChange={handleChange}  id='email' name='email' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="johnsmith@example.com" />
+                    <input type="text" onChange={handleChange}  id='phone' name='phone' className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500" placeholder="***********" />
                   </div>
                 </div>
               </div>
@@ -152,11 +169,10 @@ const Login = () => {
               </div>
             </form>
 
-            <div className='text-center mb-10'>
-            {/* <div className='mb-8 hover:text-blue-600 '> <Link href={'/forgot'}>Forgot Credentials</Link></div> */}
+            {/* <div className='text-center mb-10'>
               <p>Don't have an account?</p>
               <Link className=' hover:text-blue-600  p-2' href={'/signup'}>Register Here</Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

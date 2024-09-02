@@ -1,5 +1,5 @@
-import {connectToDatabase} from "@/mongoose/mongodbUser";
-import User from "@/model/Admin";
+import { connectToDatabase } from "@/mongoose/mongodbUser";
+import User from "@/model/Member";
 import CryptoJS from "crypto-js";
 import corsMiddleware from '@/utilis/cors';
 
@@ -8,19 +8,18 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             await connectToDatabase();
 
-            const { name, email, phone, password, confirmPassword } = req.body;
+            const { name, phone, password, confirmPassword, role, material } = req.body;
 
             // Validate input
-            if (!name || !email || !phone || !password) {
+            if (!name || !phone || !password || !role) {
                 return res.status(400).json({ error: 'All fields are required.' });
             }
 
             // Check if user already exists
-            const existingUser = await User.findOne({ email });
+            const existingUser = await User.findOne({ phone });
             if (existingUser) {
                 return res.status(400).json({ error: 'User already exists' });
             }
-
 
             // Encrypt passwords
             const encryptedPassword = CryptoJS.AES.encrypt(password, process.env.AES_SECRET).toString();
@@ -29,10 +28,11 @@ export default async function handler(req, res) {
             // Create and save new user
             let newUser = new User({
                 name,
-                email,
                 phone,
                 password: encryptedPassword,
                 confirmPassword: encryptedConfirmPassword,
+                role,
+                material: role === 'supplierExecutive' ? material : undefined // Add material only for supplierExecutive
             });
 
             try {
