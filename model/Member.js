@@ -5,7 +5,7 @@ const MemberSchema = new Schema({
   phone: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: 'account manager' },
-  assignedClients: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+  assignedClients: [{ type: Schema.Types.ObjectId, ref: 'supplier' }],
   material: {
     type: String,
     enum: ['sand', 'rmc', 'flyash', 'aggregate'],

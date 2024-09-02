@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
-import Supplier from '@/model/supplier';
-import mongoose from 'mongoose';
 import SupplierModal from '@/components/supplier';
-import Member from '@/model/Member'
+import Supplier from '@/model/supplier'
+import Member from '@/model/Member';
+import { connectToDatabase } from '@/mongoose/mongodbUser';
 
 const Suppliers = ({ initialSuppliers }) => {
   const { register, handleSubmit, reset } = useForm();
@@ -25,25 +25,22 @@ const Suppliers = ({ initialSuppliers }) => {
   }, []);
 
   const onSubmit = async (data) => {
-    const formData = new FormData();
-
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key]);
-    });
-
-    // Convert materialType to array
-    formData.set('materialType', data.materialType.split(',').map(item => item.trim()));
+    // Process data before sending
+    const formattedData = {
+      ...data,
+      materialType: data.materialType.split(',').map(item => item.trim()), // Convert to array
+      numberofVehicles: parseInt(data.numberofVehicles, 10),
+      dailyCapacity: parseInt(data.dailyCapacity, 10),
+    };
 
     try {
-      const res = await axios.post('/api/supplier', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      const res = await axios.post('/api/supplier', formattedData, {
+        headers: { 'Content-Type': 'application/json' },
       });
       console.log('Supplier added successfully:', res.data);
       reset();
     } catch (error) {
-      console.error('Error adding supplier:', error);
+      console.error('Error adding supplier:', error.response ? error.response.data : error.message);
     }
   };
 
@@ -112,6 +109,12 @@ const Suppliers = ({ initialSuppliers }) => {
               type="text"
               {...register('materialType')}
               placeholder="Material Type (comma separated)"
+              className="p-2 border rounded w-full"
+            />
+            <input
+              type="number"
+              {...register('numberofVehicles')}
+              placeholder="No. of Vehicles"
               className="p-2 border rounded w-full"
             />
             <input
@@ -197,10 +200,7 @@ const Suppliers = ({ initialSuppliers }) => {
 };
 
 export async function getServerSideProps() {
-  await mongoose.connect(process.env.MONGODB_URL_USER, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await connectToDatabase();
 
   const suppliers = await Supplier.find({}).populate('assignedMember').exec();
 
