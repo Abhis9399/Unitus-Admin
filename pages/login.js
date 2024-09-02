@@ -77,7 +77,7 @@ const Login = () => {
           if (response.role === 'admin') {
             router.push('/admin/dashboard');
           } else if (response.role === 'supplierExecutive') {
-            router.push('/mysuppliers');
+            router.push('/mySuppliers');
           } else {
             router.push('/admin/dashboard'); // Default to home or another page
           }
